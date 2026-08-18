@@ -6,6 +6,7 @@ import swaggerUi from "swagger-ui-express";
 import { swaggerSpec } from "./src/infrastructure/web/swagger.js";
 import jobRoutes from "./src/infrastructure/web/routes/jobRoutes.js";
 import authRoutes from "./src/infrastructure/web/routes/authRoutes.js";
+import applicationRoutes from "./src/infrastructure/web/routes/applicationRoutes.js";
 
 dotenv.config();
 
@@ -18,6 +19,8 @@ app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.use("/api", jobRoutes);
 
 app.use("/api", authRoutes);
+
+app.use("/api", applicationRoutes);
 
 mongoose
   .connect(process.env.MONGODB_URI)
