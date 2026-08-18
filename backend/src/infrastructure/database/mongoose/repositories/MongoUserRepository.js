@@ -1,6 +1,6 @@
-import { User } from "../../../../domain/entities/User";
-import { IUserRepository } from "../../../../domain/repositories/IUserRepository";
-import { UserModel } from "../models/UserModel";
+import { User } from "../../../../domain/entities/User.js";
+import { IUserRepository } from "../../../../domain/repositories/IUserRepository.js";
+import { UserModel } from "../models/UserModel.js";
 
 export class MongoUserRepository extends IUserRepository{
     async save(user){
