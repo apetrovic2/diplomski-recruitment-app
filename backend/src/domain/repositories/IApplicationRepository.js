@@ -14,4 +14,7 @@ export class IApplicationRepository{
     async updateStatus(applicationId, newStatus){
         throw new Error("Metoda updateStatus() nije implementirana");
     }
+    async updateCv(applicationId, cvUrl){
+        throw new Error("Metoda updateCv() nije implementirana");
+    }
 }

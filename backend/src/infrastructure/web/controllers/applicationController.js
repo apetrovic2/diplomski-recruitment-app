@@ -3,12 +3,14 @@ import { GetApplicationsByJob } from "../../../application/use-cases/GetApplicat
 import { GetApplicationsByCandidate } from "../../../application/use-cases/GetApplicationsByCandidate.js";
 import { ChangeApplicationStatus } from "../../../application/use-cases/ChangeApplicationStatus.js";
 import { MongoApplicationRepository } from "../../database/mongoose/repositories/MongoApplicationRepository.js";
+import { UploadCV } from "../../../application/use-cases/UploadCv.js";
 
 const applicationRepository = new MongoApplicationRepository();
 const applyToJobUseCase = new ApplyToJob(applicationRepository);
 const getApplicationsByJobUseCase = new GetApplicationsByJob(applicationRepository);
 const getApplicationsByCandidateUseCase = new GetApplicationsByCandidate(applicationRepository);
 const changeApplicationStatusUseCase = new ChangeApplicationStatus(applicationRepository);
+const uploadCvUseCase = new UploadCV(applicationRepository);
 
 export async function applyToJob(req, res) {
   try {
@@ -45,6 +47,22 @@ export async function changeApplicationStatus(req, res) {
     const { applicationId } = req.params;
     const { status } = req.body;
     const updated = await changeApplicationStatusUseCase.execute(applicationId, status);
+    res.status(200).json(updated);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+}
+
+export async function uploadCv(req, res) {
+  try {
+    if (!req.file) {
+      throw new Error("CV fajl nije poslat");
+    }
+
+    const { applicationId } = req.params;
+    const cvUrl = req.file.path;
+
+    const updated = await uploadCvUseCase.execute(applicationId, cvUrl);
     res.status(200).json(updated);
   } catch (error) {
     res.status(400).json({ message: error.message });

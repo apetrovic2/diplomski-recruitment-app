@@ -5,6 +5,8 @@ import {
   getApplicationsByCandidate,
   changeApplicationStatus,
 } from "../controllers/applicationController.js";
+import upload from "../middleware/upload.js";
+import { uploadCv } from "../controllers/applicationController.js";
 
 const router = Router();
 
@@ -94,5 +96,33 @@ router.get("/applications/candidate/:candidateId", getApplicationsByCandidate);
  *         description: Nevažeći status
  */
 router.put("/applications/:applicationId/status", changeApplicationStatus);
+/**
+ * @swagger
+ * /api/applications/{applicationId}/cv:
+ *   post:
+ *     summary: Otprema CV za prijavu
+ *     parameters:
+ *       - in: path
+ *         name: applicationId
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               cv:
+ *                 type: string
+ *                 format: binary
+ *     responses:
+ *       200:
+ *         description: CV uspešno otpremljen
+ *       400:
+ *         description: Greška pri otpremanju
+ */
+router.post("/applications/:applicationId/cv", upload.single("cv"), uploadCv);
 
 export default router;

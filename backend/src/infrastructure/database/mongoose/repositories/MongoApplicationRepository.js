@@ -28,4 +28,8 @@ export class MongoApplicationRepository extends IApplicationRepository{
     async updateStatus(applicationId, newStatus){
         return await ApplicationModel.findByIdAndUpdate(applicationId, {status: newStatus}, {new:true});
     }
+
+    async updateCv(applicationId, cvUrl){
+        return await ApplicationModel.findByIdAndUpdate(applicationId, {cvUrl: cvUrl}, {new:true});
+    }
 }
