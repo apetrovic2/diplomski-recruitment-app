@@ -19,7 +19,7 @@ const router = Router();
  *                 type: string
  *                 example: Frontend Developer
  *               company:
- *                 type: string
+ *                 type: strings
  *                 example: Nordic Digital
  *     responses:
  *       201:

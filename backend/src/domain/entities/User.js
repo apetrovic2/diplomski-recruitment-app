@@ -1,0 +1,18 @@
+export class User{
+    constructor(name, email, passwordHash, role="candidate"){
+        if(!name || name.trim() === ""){
+            throw new Error("Ime je obavezno");
+        }
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if(!email || !emailRegex.test(email)){
+            throw new Error("Email nije validan");
+        }
+        if(!passwordHash){
+            throw new Error("Lozinka je obavezna");
+        }
+        this.name = name;
+        this.email = email;
+        this.passwordHash = passwordHash;
+        this.role = role;
+    }
+}
