@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { createJob, getAllJobs, getJobById } from "../controllers/jobController.js";
+import { authenticate, authorize } from "../middleware/auth.js";
 
 const router = Router();
 
@@ -19,7 +20,7 @@ const router = Router();
  *                 type: string
  *                 example: Frontend Developer
  *               company:
- *                 type: strings
+ *                 type: string
  *                 example: Nordic Digital
  *     responses:
  *       201:
@@ -27,7 +28,7 @@ const router = Router();
  *       400:
  *         description: Greška u podacima
  */
-router.post("/jobs", createJob);
+router.post("/jobs", authenticate, authorize("admin"), createJob);
 
 /**
  * @swagger

@@ -7,6 +7,7 @@ import {
 } from "../controllers/applicationController.js";
 import upload from "../middleware/upload.js";
 import { uploadCv } from "../controllers/applicationController.js";
+import { authenticate, authorize } from "../middleware/auth.js";
 
 const router = Router();
 
@@ -32,7 +33,7 @@ const router = Router();
  *       400:
  *         description: Greška u podacima
  */
-router.post("/applications", applyToJob);
+router.post("/applications", authenticate, applyToJob);
 
 /**
  * @swagger
@@ -95,7 +96,7 @@ router.get("/applications/candidate/:candidateId", getApplicationsByCandidate);
  *       400:
  *         description: Nevažeći status
  */
-router.put("/applications/:applicationId/status", changeApplicationStatus);
+router.put("/applications/:applicationId/status", authenticate, authorize("admin"), changeApplicationStatus);
 /**
  * @swagger
  * /api/applications/{applicationId}/cv:
@@ -123,6 +124,6 @@ router.put("/applications/:applicationId/status", changeApplicationStatus);
  *       400:
  *         description: Greška pri otpremanju
  */
-router.post("/applications/:applicationId/cv", upload.single("cv"), uploadCv);
+router.post("/applications/:applicationId/cv", authenticate, upload.single("cv"), uploadCv);
 
 export default router;

@@ -9,6 +9,16 @@ const options = {
       description: "API dokumentacija za diplomski rad — platforma za prijavu na posao",
     },
     servers: [{ url: "http://localhost:5000" }],
+    components: {
+      securitySchemes: {
+        bearerAuth: {
+          type: "http",
+          scheme: "bearer",
+          bearerFormat: "JWT",
+        },
+      },
+    },
+    security: [{ bearerAuth: [] }],
   },
   apis: ["./src/infrastructure/web/routes/*.js"],
 };
