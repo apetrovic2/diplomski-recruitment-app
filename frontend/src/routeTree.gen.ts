@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as JobsRouteImport } from './routes/jobs'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as MyApplicationsRouteImport } from './routes/my-applications'
 import { Route as RegisterRouteImport } from './routes/register'
 import { Route as JobsJobIdRouteImport } from './routes/jobs_.$jobId'
 
@@ -30,6 +31,11 @@ const LoginRoute = LoginRouteImport.update({
   path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
+const MyApplicationsRoute = MyApplicationsRouteImport.update({
+  id: '/my-applications',
+  path: '/my-applications',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const RegisterRoute = RegisterRouteImport.update({
   id: '/register',
   path: '/register',
@@ -45,6 +51,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/jobs': typeof JobsRoute
   '/login': typeof LoginRoute
+  '/my-applications': typeof MyApplicationsRoute
   '/register': typeof RegisterRoute
   '/jobs/$jobId': typeof JobsJobIdRoute
 }
@@ -52,6 +59,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/jobs': typeof JobsRoute
   '/login': typeof LoginRoute
+  '/my-applications': typeof MyApplicationsRoute
   '/register': typeof RegisterRoute
   '/jobs/$jobId': typeof JobsJobIdRoute
 }
@@ -60,21 +68,32 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/jobs': typeof JobsRoute
   '/login': typeof LoginRoute
+  '/my-applications': typeof MyApplicationsRoute
   '/register': typeof RegisterRoute
   '/jobs_/$jobId': typeof JobsJobIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/jobs' | '/login' | '/register' | '/jobs/$jobId'
+  fullPaths:
+    '/' | '/jobs' | '/login' | '/my-applications' | '/register' | '/jobs/$jobId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/jobs' | '/login' | '/register' | '/jobs/$jobId'
-  id: '__root__' | '/' | '/jobs' | '/login' | '/register' | '/jobs_/$jobId'
+  to:
+    '/' | '/jobs' | '/login' | '/my-applications' | '/register' | '/jobs/$jobId'
+  id:
+    | '__root__'
+    | '/'
+    | '/jobs'
+    | '/login'
+    | '/my-applications'
+    | '/register'
+    | '/jobs_/$jobId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   JobsRoute: typeof JobsRoute
   LoginRoute: typeof LoginRoute
+  MyApplicationsRoute: typeof MyApplicationsRoute
   RegisterRoute: typeof RegisterRoute
   JobsJobIdRoute: typeof JobsJobIdRoute
 }
@@ -102,6 +121,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/my-applications': {
+      id: '/my-applications'
+      path: '/my-applications'
+      fullPath: '/my-applications'
+      preLoaderRoute: typeof MyApplicationsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/register': {
       id: '/register'
       path: '/register'
@@ -123,6 +149,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   JobsRoute: JobsRoute,
   LoginRoute: LoginRoute,
+  MyApplicationsRoute: MyApplicationsRoute,
   RegisterRoute: RegisterRoute,
   JobsJobIdRoute: JobsJobIdRoute,
 }
