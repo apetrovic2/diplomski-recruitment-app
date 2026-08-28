@@ -5,6 +5,14 @@ export interface Job {
   title: string;
   company: string;
   status: string;
+  workArrangement?: string;
+  field?: string;
+  city?: string;
+  educationLevel?: string;
+  employmentType?: string;
+  workHours?: string;
+  experienceLevel?: string;
+  applicationDeadline?: string;
 }
 
 export async function fetchJobs(): Promise<Job[]> {
@@ -13,4 +21,22 @@ export async function fetchJobs(): Promise<Job[]> {
 
 export async function fetchJobById(jobId: string): Promise<Job> {
   return apiFetch(`/jobs/${jobId}`);
+}
+
+export async function createJob(data: {
+  title: string;
+  company: string;
+  workArrangement: string;
+  field: string;
+  city: string;
+  educationLevel: string;
+  employmentType: string;
+  workHours: string;
+  experienceLevel: string;
+  applicationDeadline: string;
+}): Promise<Job> {
+  return apiFetch("/jobs", {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
 }

@@ -1,6 +1,8 @@
 import { Router } from "express";
-import { register, login } from "../controllers/authController.js";
-
+import { register, login, uploadUserCv, deleteUserCv } from "../controllers/authController.js";
+import upload from "../middleware/upload.js";
+import { authenticate } from "../middleware/auth.js";
+ 
 const router = Router();
 
 /**
@@ -60,5 +62,36 @@ router.post("/auth/register", register);
  *         description: Pogrešan email ili lozinka
  */
 router.post("/auth/login", login);
+
+/**
+ * @swagger
+ * /api/auth/{userId}/cv:
+ *   post:
+ *     summary: Otprema opšti CV korisnika (na profilu)
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               cv:
+ *                 type: string
+ *                 format: binary
+ *     responses:
+ *       200:
+ *         description: CV uspešno otpremljen
+ *       400:
+ *         description: Greška pri otpremanju
+ */
+router.post("/auth/:userId/cv", authenticate, upload.single("cv"), uploadUserCv);
+
+router.delete("/auth/:userId/cv", authenticate, deleteUserCv);
 
 export default router;

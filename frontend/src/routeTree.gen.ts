@@ -13,8 +13,11 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as JobsRouteImport } from './routes/jobs'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as MyApplicationsRouteImport } from './routes/my-applications'
+import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as RegisterRouteImport } from './routes/register'
+import { Route as AdminCreateJobRouteImport } from './routes/admin.create-job'
 import { Route as JobsJobIdRouteImport } from './routes/jobs_.$jobId'
+import { Route as AdminJobsJobIdApplicationsRouteImport } from './routes/admin.jobs_.$jobId.applications'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -36,9 +39,19 @@ const MyApplicationsRoute = MyApplicationsRouteImport.update({
   path: '/my-applications',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ProfileRoute = ProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const RegisterRoute = RegisterRouteImport.update({
   id: '/register',
   path: '/register',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminCreateJobRoute = AdminCreateJobRouteImport.update({
+  id: '/admin/create-job',
+  path: '/admin/create-job',
   getParentRoute: () => rootRouteImport,
 } as any)
 const JobsJobIdRoute = JobsJobIdRouteImport.update({
@@ -46,22 +59,34 @@ const JobsJobIdRoute = JobsJobIdRouteImport.update({
   path: '/jobs/$jobId',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminJobsJobIdApplicationsRoute =
+  AdminJobsJobIdApplicationsRouteImport.update({
+    id: '/admin/jobs_/$jobId/applications',
+    path: '/admin/jobs/$jobId/applications',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/jobs': typeof JobsRoute
   '/login': typeof LoginRoute
   '/my-applications': typeof MyApplicationsRoute
+  '/profile': typeof ProfileRoute
   '/register': typeof RegisterRoute
+  '/admin/create-job': typeof AdminCreateJobRoute
   '/jobs/$jobId': typeof JobsJobIdRoute
+  '/admin/jobs/$jobId/applications': typeof AdminJobsJobIdApplicationsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/jobs': typeof JobsRoute
   '/login': typeof LoginRoute
   '/my-applications': typeof MyApplicationsRoute
+  '/profile': typeof ProfileRoute
   '/register': typeof RegisterRoute
+  '/admin/create-job': typeof AdminCreateJobRoute
   '/jobs/$jobId': typeof JobsJobIdRoute
+  '/admin/jobs/$jobId/applications': typeof AdminJobsJobIdApplicationsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -69,24 +94,46 @@ export interface FileRoutesById {
   '/jobs': typeof JobsRoute
   '/login': typeof LoginRoute
   '/my-applications': typeof MyApplicationsRoute
+  '/profile': typeof ProfileRoute
   '/register': typeof RegisterRoute
+  '/admin/create-job': typeof AdminCreateJobRoute
   '/jobs_/$jobId': typeof JobsJobIdRoute
+  '/admin/jobs_/$jobId/applications': typeof AdminJobsJobIdApplicationsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    '/' | '/jobs' | '/login' | '/my-applications' | '/register' | '/jobs/$jobId'
+    | '/'
+    | '/jobs'
+    | '/login'
+    | '/my-applications'
+    | '/profile'
+    | '/register'
+    | '/admin/create-job'
+    | '/jobs/$jobId'
+    | '/admin/jobs/$jobId/applications'
   fileRoutesByTo: FileRoutesByTo
   to:
-    '/' | '/jobs' | '/login' | '/my-applications' | '/register' | '/jobs/$jobId'
+    | '/'
+    | '/jobs'
+    | '/login'
+    | '/my-applications'
+    | '/profile'
+    | '/register'
+    | '/admin/create-job'
+    | '/jobs/$jobId'
+    | '/admin/jobs/$jobId/applications'
   id:
     | '__root__'
     | '/'
     | '/jobs'
     | '/login'
     | '/my-applications'
+    | '/profile'
     | '/register'
+    | '/admin/create-job'
     | '/jobs_/$jobId'
+    | '/admin/jobs_/$jobId/applications'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -94,8 +141,11 @@ export interface RootRouteChildren {
   JobsRoute: typeof JobsRoute
   LoginRoute: typeof LoginRoute
   MyApplicationsRoute: typeof MyApplicationsRoute
+  ProfileRoute: typeof ProfileRoute
   RegisterRoute: typeof RegisterRoute
+  AdminCreateJobRoute: typeof AdminCreateJobRoute
   JobsJobIdRoute: typeof JobsJobIdRoute
+  AdminJobsJobIdApplicationsRoute: typeof AdminJobsJobIdApplicationsRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -128,6 +178,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MyApplicationsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/profile': {
+      id: '/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof ProfileRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/register': {
       id: '/register'
       path: '/register'
@@ -135,11 +192,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RegisterRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/create-job': {
+      id: '/admin/create-job'
+      path: '/admin/create-job'
+      fullPath: '/admin/create-job'
+      preLoaderRoute: typeof AdminCreateJobRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/jobs_/$jobId': {
       id: '/jobs_/$jobId'
       path: '/jobs/$jobId'
       fullPath: '/jobs/$jobId'
       preLoaderRoute: typeof JobsJobIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/jobs_/$jobId/applications': {
+      id: '/admin/jobs_/$jobId/applications'
+      path: '/admin/jobs/$jobId/applications'
+      fullPath: '/admin/jobs/$jobId/applications'
+      preLoaderRoute: typeof AdminJobsJobIdApplicationsRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -150,8 +221,11 @@ const rootRouteChildren: RootRouteChildren = {
   JobsRoute: JobsRoute,
   LoginRoute: LoginRoute,
   MyApplicationsRoute: MyApplicationsRoute,
+  ProfileRoute: ProfileRoute,
   RegisterRoute: RegisterRoute,
+  AdminCreateJobRoute: AdminCreateJobRoute,
   JobsJobIdRoute: JobsJobIdRoute,
+  AdminJobsJobIdApplicationsRoute: AdminJobsJobIdApplicationsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

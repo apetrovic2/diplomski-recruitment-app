@@ -38,3 +38,14 @@ export async function uploadCv(applicationId: string, file: File): Promise<Appli
 export async function fetchMyApplications(candidateId: string): Promise<Application[]> {
   return apiFetch(`/applications/candidate/${candidateId}`);
 }
+
+export async function fetchApplicationsByJob(jobId: string): Promise<Application[]> {
+  return apiFetch(`/applications/job/${jobId}`);
+}
+
+export async function changeApplicationStatus(applicationId: string, status: string): Promise<Application> {
+  return apiFetch(`/applications/${applicationId}/status`, {
+    method: "PUT",
+    body: JSON.stringify({ status }),
+  });
+}

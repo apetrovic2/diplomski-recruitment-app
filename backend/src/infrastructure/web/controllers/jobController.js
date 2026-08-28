@@ -10,8 +10,14 @@ const getJobByIdUseCase = new GetJobById(jobRepository);
 
 export async function createJob(req, res) {
   try {
-    const { title, company } = req.body;
-    const newJob = await createJobUseCase.execute(title, company);
+    const {
+      title, company, workArrangement, field, city,
+      educationLevel, employmentType, workHours, experienceLevel, applicationDeadline
+    } = req.body;
+    const newJob = await createJobUseCase.execute(
+      title, company, workArrangement, field, city,
+      educationLevel, employmentType, workHours, experienceLevel, applicationDeadline
+    );
     res.status(201).json(newJob);
   } catch (error) {
     res.status(400).json({ message: error.message });

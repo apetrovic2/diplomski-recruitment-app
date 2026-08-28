@@ -5,8 +5,8 @@ export class CreateJobListing {
     this.jobRepository = jobRepository;
   }
 
-  async execute(title, company) {
-    const job = new JobListing(title, company);
+  async execute(title, company, workArrangement, field, city, educationLevel, employmentType, workHours, experienceLevel, applicationDeadline) {
+    const job = new JobListing(title, company, workArrangement, field, city, educationLevel, employmentType, workHours, experienceLevel, applicationDeadline);
     const savedJob = await this.jobRepository.save(job);
     return savedJob;
   }

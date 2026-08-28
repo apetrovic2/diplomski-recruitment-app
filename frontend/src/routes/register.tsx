@@ -2,6 +2,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { register } from "../api/auth";
+import { useTheme } from "../context/ThemeContext";
 
 export const Route = createFileRoute("/register")({
   component: RegisterPage,
@@ -13,6 +14,8 @@ function RegisterPage() {
   const [password, setPassword] = useState("");
   const [role, setRole] = useState("candidate");
   const navigate = useNavigate();
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
 
   const registerMutation = useMutation({
     mutationFn: () => register({ name, email, password, role }),
@@ -21,9 +24,6 @@ function RegisterPage() {
       localStorage.setItem("user", JSON.stringify(result.user));
       navigate({ to: "/jobs" });
     },
-    onError: (error) => {
-      console.error("Greška pri registraciji:", error.message);
-    },
   });
 
   function handleSubmit(e: React.FormEvent) {
@@ -31,46 +31,50 @@ function RegisterPage() {
     registerMutation.mutate();
   }
 
+  const inputClass = isDark
+    ? "w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-3 text-white placeholder:text-gray-500 outline-none focus:border-green-400"
+    : "w-full bg-white border border-purple-100 rounded-2xl px-4 py-3 text-gray-900 placeholder:text-gray-400 outline-none focus:border-purple-400 shadow-sm";
+
+  const buttonClass = isDark
+    ? "w-full bg-green-400 text-gray-900 font-semibold py-3 rounded-xl hover:bg-green-300 transition-colors"
+    : "w-full text-white font-semibold py-3 rounded-2xl bg-gradient-to-r from-pink-500 to-purple-600 hover:opacity-90 transition-opacity shadow-lg shadow-purple-300";
+
   return (
-    <div>
-      <h1>Registracija</h1>
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label>Ime i prezime</label>
-          <input
-            type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-          />
-        </div>
-        <div>
-          <label>Email</label>
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
-        </div>
-        <div>
-          <label>Lozinka</label>
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-        </div>
-        <div>
-          <label>Registrujem se kao</label>
-          <select value={role} onChange={(e) => setRole(e.target.value)}>
-            <option value="candidate">Kandidat</option>
-            <option value="admin">HR Administrator</option>
-          </select>
-        </div>
-        <button type="submit" disabled={registerMutation.isPending}>
+    <div className="max-w-sm mx-auto px-6 py-16">
+      <h1 className={`text-2xl font-bold text-center mb-8 ${isDark ? "text-white" : "text-gray-900"}`}>
+        Registracija
+      </h1>
+      <form onSubmit={handleSubmit} className="flex flex-col gap-3">
+        <input
+          type="text"
+          placeholder="Ime i prezime"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          className={inputClass}
+        />
+        <input
+          type="email"
+          placeholder="Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          className={inputClass}
+        />
+        <input
+          type="password"
+          placeholder="Lozinka"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          className={inputClass}
+        />
+        <select value={role} onChange={(e) => setRole(e.target.value)} className={inputClass}>
+          <option value="candidate">Kandidat</option>
+          <option value="admin">HR Administrator</option>
+        </select>
+        <button type="submit" disabled={registerMutation.isPending} className={buttonClass}>
           {registerMutation.isPending ? "Registrujem..." : "Registruj se"}
         </button>
         {registerMutation.isError && (
-          <p style={{ color: "red" }}>{registerMutation.error.message}</p>
+          <p className="text-red-500 text-sm text-center">{registerMutation.error.message}</p>
         )}
       </form>
     </div>

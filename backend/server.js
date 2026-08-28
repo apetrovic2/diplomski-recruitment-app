@@ -22,6 +22,8 @@ app.use("/api", authRoutes);
 
 app.use("/api", applicationRoutes);
 
+app.use("/uploads", express.static("uploads"));
+
 mongoose
   .connect(process.env.MONGODB_URI)
   .then(() => {
