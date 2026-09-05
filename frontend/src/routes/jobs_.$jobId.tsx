@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useState } from "react";
 import { fetchJobById } from "../api/jobs";
@@ -17,6 +17,7 @@ function JobDetailPage() {
   const isDark = theme === "dark";
 
   const user = JSON.parse(localStorage.getItem("user") || "{}");
+  const isAdmin = user.role === "admin";
 
   const { data, isLoading, error } = useQuery({
     queryKey: ["job", jobId],
@@ -143,19 +144,31 @@ function JobDetailPage() {
           )}
         </div>
 
-        <label className={`block text-sm mb-2 ${isDark ? "text-gray-300" : "text-gray-600"}`}>
-          Otpremi CV (PDF)
-        </label>
-        <input
-          type="file"
-          accept="application/pdf"
-          onChange={(e) => setCvFile(e.target.files?.[0] || null)}
-          className={isDark ? "text-gray-300" : "text-gray-600"}
-        />
+        {isAdmin ? (
+          <Link
+            to="/admin/jobs/$jobId/applications"
+            params={{ jobId }}
+            className={buttonClass + " block text-center"}
+          >
+            Pregledaj prijave
+          </Link>
+        ) : (
+          <>
+            <label className={`block text-sm mb-2 ${isDark ? "text-gray-300" : "text-gray-600"}`}>
+              Otpremi CV (PDF)
+            </label>
+            <input
+              type="file"
+              accept="application/pdf"
+              onChange={(e) => setCvFile(e.target.files?.[0] || null)}
+              className={isDark ? "text-gray-300" : "text-gray-600"}
+            />
 
-        <button onClick={handleApplyClick} disabled={applyMutation.isPending} className={buttonClass}>
-          {applyMutation.isPending ? "Šaljem prijavu..." : "Prijavi se na poziciju"}
-        </button>
+            <button onClick={handleApplyClick} disabled={applyMutation.isPending} className={buttonClass}>
+              {applyMutation.isPending ? "Šaljem prijavu..." : "Prijavi se na poziciju"}
+            </button>
+          </>
+        )}
       </div>
 
       {showConfirmModal && (

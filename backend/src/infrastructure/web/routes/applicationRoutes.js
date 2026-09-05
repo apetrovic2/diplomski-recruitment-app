@@ -4,6 +4,8 @@ import {
   getApplicationsByJob,
   getApplicationsByCandidate,
   changeApplicationStatus,
+  scheduleInterview,
+  rateCandidate,
 } from "../controllers/applicationController.js";
 import upload from "../middleware/upload.js";
 import { uploadCv } from "../controllers/applicationController.js";
@@ -97,6 +99,68 @@ router.get("/applications/candidate/:candidateId", getApplicationsByCandidate);
  *         description: Nevažeći status
  */
 router.put("/applications/:applicationId/status", authenticate, authorize("admin"), changeApplicationStatus);
+
+/**
+ * @swagger
+ * /api/applications/{applicationId}/interview:
+ *   put:
+ *     summary: Zakazuje intervju za prijavu
+ *     parameters:
+ *       - in: path
+ *         name: applicationId
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               interviewDate:
+ *                 type: string
+ *                 example: "2026-09-15T10:00:00"
+ *     responses:
+ *       200:
+ *         description: Intervju zakazan
+ *       400:
+ *         description: Greška u podacima
+ */
+router.put("/applications/:applicationId/interview", authenticate, authorize("admin"), scheduleInterview);
+
+/**
+ * @swagger
+ * /api/applications/{applicationId}/rating:
+ *   put:
+ *     summary: Ocenjuje kandidata za prijavu
+ *     parameters:
+ *       - in: path
+ *         name: applicationId
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               rating:
+ *                 type: number
+ *                 example: 4
+ *               note:
+ *                 type: string
+ *                 example: "Dobar utisak, dobro poznaje React"
+ *     responses:
+ *       200:
+ *         description: Ocena sačuvana
+ *       400:
+ *         description: Greška u podacima
+ */
+router.put("/applications/:applicationId/rating", authenticate, authorize("admin"), rateCandidate);
+
 /**
  * @swagger
  * /api/applications/{applicationId}/cv:

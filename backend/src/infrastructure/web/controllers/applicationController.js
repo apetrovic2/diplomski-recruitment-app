@@ -4,6 +4,8 @@ import { GetApplicationsByCandidate } from "../../../application/use-cases/GetAp
 import { ChangeApplicationStatus } from "../../../application/use-cases/ChangeApplicationStatus.js";
 import { MongoApplicationRepository } from "../../database/mongoose/repositories/MongoApplicationRepository.js";
 import { UploadCV } from "../../../application/use-cases/UploadCv.js";
+import { ScheduleInterview } from "../../../application/use-cases/ScheduleInterview.js";
+import { RateCandidate } from "../../../application/use-cases/RateCandidate.js";
 
 const applicationRepository = new MongoApplicationRepository();
 const applyToJobUseCase = new ApplyToJob(applicationRepository);
@@ -11,6 +13,8 @@ const getApplicationsByJobUseCase = new GetApplicationsByJob(applicationReposito
 const getApplicationsByCandidateUseCase = new GetApplicationsByCandidate(applicationRepository);
 const changeApplicationStatusUseCase = new ChangeApplicationStatus(applicationRepository);
 const uploadCvUseCase = new UploadCV(applicationRepository);
+const scheduleInterviewUseCase = new ScheduleInterview(applicationRepository);
+const rateCandidateUseCase = new RateCandidate(applicationRepository);
 
 export async function applyToJob(req, res) {
   try {
@@ -63,6 +67,28 @@ export async function uploadCv(req, res) {
     const cvUrl = req.file.path;
 
     const updated = await uploadCvUseCase.execute(applicationId, cvUrl);
+    res.status(200).json(updated);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+}
+
+export async function scheduleInterview(req, res) {
+  try {
+    const { applicationId } = req.params;
+    const { interviewDate } = req.body;
+    const updated = await scheduleInterviewUseCase.execute(applicationId, interviewDate);
+    res.status(200).json(updated);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+}
+
+export async function rateCandidate(req, res) {
+  try {
+    const { applicationId } = req.params;
+    const { rating, note } = req.body;
+    const updated = await rateCandidateUseCase.execute(applicationId, rating, note);
     res.status(200).json(updated);
   } catch (error) {
     res.status(400).json({ message: error.message });

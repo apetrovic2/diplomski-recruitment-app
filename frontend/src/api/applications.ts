@@ -6,6 +6,9 @@ export interface Application {
   jobId: string;
   status: string;
   cvUrl: string | null;
+  interviewDate?: string | null;
+  rating?: number | null;
+  note?: string | null;
 }
 
 export async function applyToJob(jobId: string, candidateId: string): Promise<Application> {
@@ -47,5 +50,19 @@ export async function changeApplicationStatus(applicationId: string, status: str
   return apiFetch(`/applications/${applicationId}/status`, {
     method: "PUT",
     body: JSON.stringify({ status }),
+  });
+}
+
+export async function scheduleInterview(applicationId: string, interviewDate: string): Promise<Application> {
+  return apiFetch(`/applications/${applicationId}/interview`, {
+    method: "PUT",
+    body: JSON.stringify({ interviewDate }),
+  });
+}
+
+export async function rateCandidate(applicationId: string, rating: number, note: string): Promise<Application> {
+  return apiFetch(`/applications/${applicationId}/rating`, {
+    method: "PUT",
+    body: JSON.stringify({ rating, note }),
   });
 }

@@ -16,6 +16,7 @@ function RegisterPage() {
   const navigate = useNavigate();
   const { theme } = useTheme();
   const isDark = theme === "dark";
+  const [confirmPassword, setConfirmPassword] = useState("");
 
   const registerMutation = useMutation({
     mutationFn: () => register({ name, email, password, role }),
@@ -28,6 +29,14 @@ function RegisterPage() {
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    if (password.length < 8) {
+      alert("Lozinka mora imati bar 8 karaktera");
+      return;
+    }
+    if (password !== confirmPassword) {
+      alert("Lozinke se ne poklapaju");
+      return;
+    }
     registerMutation.mutate();
   }
 
@@ -64,6 +73,13 @@ function RegisterPage() {
           placeholder="Lozinka"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
+          className={inputClass}
+        />
+        <input
+          type="password"
+          placeholder="Potvrdi lozinku"
+          value={confirmPassword}
+          onChange={(e) => setConfirmPassword(e.target.value)}
           className={inputClass}
         />
         <select value={role} onChange={(e) => setRole(e.target.value)} className={inputClass}>

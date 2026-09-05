@@ -17,4 +17,10 @@ export class IApplicationRepository{
     async updateCv(applicationId, cvUrl){
         throw new Error("Metoda updateCv() nije implementirana");
     }
+    async updateInterviewDate(applicationId, interviewDate) {
+        throw new Error("Metoda updateInterviewDate() nije implementirana");
+    }
+    async updateRating(applicationId, rating, note) {
+        throw new Error("Metoda updateRating() nije implementirana");
+    }
 }

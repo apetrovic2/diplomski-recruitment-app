@@ -56,6 +56,16 @@ function MyApplicationsPage() {
               <p className={isDark ? "text-gray-400 text-sm" : "text-gray-500 text-sm"}>
                 CV: {app.cvUrl ? "Otpremljen" : "Nije otpremljen"}
               </p>
+              {app.interviewDate && (
+                <p className={isDark ? "text-green-400 text-sm mt-1" : "text-green-600 text-sm mt-1"}>
+                  Intervju zakazan: {new Date(app.interviewDate).toLocaleString("sr-RS")}
+                </p>
+              )}
+              {app.rating && (
+                <p className={isDark ? "text-gray-400 text-sm mt-1" : "text-gray-500 text-sm mt-1"}>
+                  Ocena: {app.rating}/5{app.note ? ` — ${app.note}` : ""}
+                </p>
+              )}
             </div>
           );
         })}

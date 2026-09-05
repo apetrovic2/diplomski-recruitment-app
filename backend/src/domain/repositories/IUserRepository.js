@@ -18,4 +18,5 @@ export class IUserRepository{
     async deleteCv(userId) {
         throw new Error("Metoda deleteCv() nije implementirana");
     }
+
 }

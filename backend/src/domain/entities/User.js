@@ -10,6 +10,9 @@ export class User{
         if(!passwordHash){
             throw new Error("Lozinka je obavezna");
         }
+        if (passwordHash.length < 8) {
+            throw new Error("Lozinka mora imati bar 8 karaktera");
+        }
         this.name = name;
         this.email = email;
         this.passwordHash = passwordHash;

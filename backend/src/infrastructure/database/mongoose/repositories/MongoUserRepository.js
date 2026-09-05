@@ -28,4 +28,12 @@ export class MongoUserRepository extends IUserRepository{
     async deleteCv(userId) {
         return await UserModel.findByIdAndUpdate(userId, { cvUrl: null }, { new: true });
     }
+
+    async updateVerificationStatus(userId, emailVerified, verificationToken) {
+        return await UserModel.findByIdAndUpdate(userId, { emailVerified, verificationToken }, { new: true });
+    }
+    
+    async findByVerificationToken(token) {
+        return await UserModel.findOne({ verificationToken: token });
+    }
 }
