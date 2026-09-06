@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { fetchMyApplications } from "../api/applications";
 import { fetchJobs } from "../api/jobs";
@@ -32,9 +32,9 @@ function MyApplicationsPage() {
   }
 
   const cardClass = isDark
-    ? "bg-gray-800 border border-gray-700 rounded-2xl p-5"
-    : "bg-white rounded-2xl p-5 shadow-md shadow-purple-100 border border-purple-50";
-
+    ? "bg-gray-800 border-2 border-green-400/40 rounded-2xl p-5"
+    : "bg-white border-2 border-purple-300/50 rounded-2xl p-5 shadow-md shadow-purple-100";
+  
   return (
     <div className="max-w-2xl mx-auto px-6 py-10">
       <h1 className={`text-3xl font-bold mb-6 ${isDark ? "text-white" : "text-gray-900"}`}>Moje prijave</h1>
@@ -46,9 +46,13 @@ function MyApplicationsPage() {
           const job = jobs?.find((j) => j._id === app.jobId);
           return (
             <div key={app._id} className={cardClass}>
-              <h2 className={isDark ? "text-white font-semibold" : "text-gray-900 font-semibold"}>
+              <Link
+                to="/jobs/$jobId"
+                params={{ jobId: app.jobId }}
+                className={isDark ? "text-white font-semibold hover:text-green-400" : "text-gray-900 font-semibold hover:text-purple-600"}
+              >
                 {job?.title || "Oglas"}
-              </h2>
+              </Link>
               <p className={isDark ? "text-gray-400 text-sm mb-2" : "text-gray-500 text-sm mb-2"}>
                 {job?.company}
               </p>

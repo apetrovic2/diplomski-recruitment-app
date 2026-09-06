@@ -14,6 +14,14 @@ const cities = ["Beograd", "Novi Sad", "Niš", "Kragujevac", "Subotica", "Zrenja
 const fields = ["IT", "Marketing", "Finansije", "Prodaja", "Administracija", "Zdravstvo", "Obrazovanje", "Proizvodnja", "Logistika", "Ljudski resursi", "Pravo", "Korisnička podrška", "Ostalo"];
 const employmentTypes = ["Ugovor na neodređeno", "Ugovor na određeno", "Honorarno", "Praksa", "Sezonski posao"];
 
+const avatarGradients = [
+  "from-pink-500 to-orange-400",
+  "from-blue-500 to-purple-500",
+  "from-green-400 to-blue-500",
+  "from-purple-500 to-pink-500",
+  "from-orange-400 to-red-500",
+];
+
 function JobsPage() {
   const { data: jobs, isLoading, error } = useQuery({
     queryKey: ["jobs"],
@@ -55,12 +63,16 @@ function JobsPage() {
   }
 
   const cardClass = isDark
-    ? "block bg-gray-800 border border-gray-700 rounded-2xl p-5 hover:border-green-400/50 transition-colors"
-    : "block bg-white rounded-2xl p-5 shadow-md shadow-purple-100 hover:shadow-xl hover:shadow-purple-200 transition-shadow border border-purple-50";
+    ? "block bg-gray-800 border-2 border-green-400/40 rounded-2xl p-5 hover:border-green-400 transition-colors"
+    : "block bg-white border-2 border-purple-300/50 rounded-2xl p-5 shadow-md shadow-purple-100 hover:border-purple-400 hover:shadow-xl hover:shadow-purple-200 transition-all";
 
   const filterInputClass = isDark
-    ? "bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-white"
-    : "bg-white border border-purple-100 rounded-xl px-3 py-2 text-gray-900 shadow-sm";
+    ? "bg-gray-800 border-2 border-green-400/40 rounded-xl px-3 py-2 text-white"
+    : "bg-white border-2 border-purple-300/50 rounded-xl px-3 py-2 text-gray-900 shadow-sm";
+
+  const cityBadgeClass = isDark ? "text-xs bg-blue-900/50 text-blue-300 px-2 py-1 rounded-full" : "text-xs bg-blue-50 text-blue-700 px-2 py-1 rounded-full";
+  const arrangementBadgeClass = isDark ? "text-xs bg-purple-900/50 text-purple-300 px-2 py-1 rounded-full" : "text-xs bg-purple-50 text-purple-700 px-2 py-1 rounded-full";
+  const employmentBadgeClass = isDark ? "text-xs bg-orange-900/50 text-orange-300 px-2 py-1 rounded-full" : "text-xs bg-orange-50 text-orange-700 px-2 py-1 rounded-full";
 
   return (
     <div className="max-w-3xl mx-auto px-6 py-10">
@@ -68,7 +80,7 @@ function JobsPage() {
         Otvorene pozicije
       </h1>
 
-      <div className="flex flex-col md:flex-row gap-3 mb-6">
+      <div className="mb-3">
         <input
           type="text"
           placeholder="Pretraži po nazivu ili kompaniji..."
@@ -76,10 +88,13 @@ function JobsPage() {
           onChange={(e) => setSearchText(e.target.value)}
           className={
             isDark
-              ? "flex-1 bg-gray-800 border border-gray-700 rounded-xl px-4 py-2 text-white placeholder:text-gray-500 outline-none"
-              : "flex-1 bg-white border border-purple-100 rounded-xl px-4 py-2 text-gray-900 placeholder:text-gray-400 outline-none shadow-sm"
+              ? "w-full bg-gray-800 border-2 border-green-400/40 rounded-xl px-4 py-2 text-white placeholder:text-gray-500 outline-none"
+              : "w-full bg-white border-2 border-purple-300/50 rounded-xl px-4 py-2 text-gray-900 placeholder:text-gray-400 outline-none shadow-sm"
           }
         />
+      </div>
+
+      <div className="flex flex-col md:flex-row gap-3 mb-6">
         <select value={cityFilter} onChange={(e) => setCityFilter(e.target.value)} className={filterInputClass}>
           <option value="">Svi gradovi</option>
           {cities.map((city) => (
@@ -105,34 +120,30 @@ function JobsPage() {
       </div>
 
       <div className="flex flex-col gap-3">
-        {filteredJobs?.map((job) => {
+        {filteredJobs?.map((job, index) => {
           const alreadyApplied = myApplications?.some((app) => app.jobId === job._id);
+          const gradient = avatarGradients[index % avatarGradients.length];
+          const initials = job.company?.split(" ").map((w) => w[0]).join("").slice(0, 2).toUpperCase();
+
           return (
             <Link key={job._id} to="/jobs/$jobId" params={{ jobId: job._id }} className={cardClass}>
               <div className="flex items-center justify-between">
-                <div>
-                  <h2 className={`text-lg font-semibold ${isDark ? "text-white" : "text-gray-900"}`}>{job.title}</h2>
-                  <p className={isDark ? "text-gray-400" : "text-gray-500"}>{job.company}</p>
-                  <div className="flex flex-wrap gap-2 mt-2">
-                    {job.city && (
-                      <span className={isDark ? "text-xs bg-gray-700 text-gray-300 px-2 py-1 rounded-full" : "text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full"}>
-                        {job.city}
-                      </span>
-                    )}
-                    {job.workArrangement && (
-                      <span className={isDark ? "text-xs bg-gray-700 text-gray-300 px-2 py-1 rounded-full" : "text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full"}>
-                        {job.workArrangement}
-                      </span>
-                    )}
-                    {job.employmentType && (
-                      <span className={isDark ? "text-xs bg-gray-700 text-gray-300 px-2 py-1 rounded-full" : "text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full"}>
-                        {job.employmentType}
-                      </span>
-                    )}
+                <div className="flex items-start gap-3">
+                  <div className={`w-11 h-11 rounded-xl bg-gradient-to-br ${gradient} text-white flex items-center justify-center text-sm font-bold flex-shrink-0`}>
+                    {initials}
+                  </div>
+                  <div>
+                    <h2 className={`text-lg font-semibold ${isDark ? "text-white" : "text-gray-900"}`}>{job.title}</h2>
+                    <p className={isDark ? "text-gray-400" : "text-gray-500"}>{job.company}</p>
+                    <div className="flex flex-wrap gap-2 mt-2">
+                      {job.city && <span className={cityBadgeClass}>{job.city}</span>}
+                      {job.workArrangement && <span className={arrangementBadgeClass}>{job.workArrangement}</span>}
+                      {job.employmentType && <span className={employmentBadgeClass}>{job.employmentType}</span>}
+                    </div>
                   </div>
                 </div>
                 {alreadyApplied && (
-                  <span className={isDark ? "text-green-400 text-sm font-medium" : "text-green-600 text-sm font-medium"}>
+                  <span className={isDark ? "text-green-400 text-sm font-medium flex-shrink-0" : "text-green-600 text-sm font-medium flex-shrink-0"}>
                     ✓ Već ste se prijavili
                   </span>
                 )}

@@ -56,3 +56,7 @@ export async function deleteUserCv(userId: string): Promise<{ cvUrl: string | nu
     method: "DELETE",
   });
 }
+
+export async function fetchUserById(userId: string): Promise<{ id: string; name: string; email: string }> {
+  return apiFetch(`/auth/${userId}`);
+}

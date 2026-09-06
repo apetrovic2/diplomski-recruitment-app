@@ -1,8 +1,9 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { login } from "../api/auth";
 import { useTheme } from "../context/ThemeContext";
+import { useAuth } from "../context/AuthContext";
 
 export const Route = createFileRoute("/login")({
   component: LoginPage,
@@ -14,12 +15,12 @@ function LoginPage() {
   const navigate = useNavigate();
   const { theme } = useTheme();
   const isDark = theme === "dark";
+  const { login: authLogin } = useAuth();
 
   const loginMutation = useMutation({
     mutationFn: () => login(email, password),
     onSuccess: (result) => {
-      localStorage.setItem("token", result.token);
-      localStorage.setItem("user", JSON.stringify(result.user));
+      authLogin(result.token, result.user);
       navigate({ to: "/jobs" });
     },
   });
@@ -64,6 +65,12 @@ function LoginPage() {
           <p className="text-red-500 text-sm text-center">{loginMutation.error.message}</p>
         )}
       </form>
+      <p className={isDark ? "text-gray-400 text-sm text-center mt-4" : "text-gray-500 text-sm text-center mt-4"}>
+        Nemate nalog?{" "}
+        <Link to="/register" className={isDark ? "text-green-400 font-medium" : "text-purple-600 font-medium"}>
+          Registrujte se
+        </Link>
+      </p>
     </div>
   );
 }

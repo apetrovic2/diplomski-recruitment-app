@@ -18,7 +18,7 @@ export class MongoUserRepository extends IUserRepository{
     }
 
     async findById(id){
-        return await UserModel.findOne({id});
+        return await UserModel.findById(id);
     }
 
     async updateCv(userId, cvUrl) {

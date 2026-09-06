@@ -1,8 +1,8 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useState } from "react";
 import { fetchJobById } from "../api/jobs";
-import { applyToJob, uploadCv, fetchMyApplications } from "../api/applications";
+import { applyToJob, uploadCv, fetchMyApplications, fetchApplicationsByJob } from "../api/applications";
 import { useTheme } from "../context/ThemeContext";
 
 export const Route = createFileRoute("/jobs_/$jobId")({
@@ -11,8 +11,11 @@ export const Route = createFileRoute("/jobs_/$jobId")({
 
 function JobDetailPage() {
   const { jobId } = Route.useParams();
+  const navigate = useNavigate();
   const [cvFile, setCvFile] = useState<File | null>(null);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [showNoApplicationsModal, setShowNoApplicationsModal] = useState(false);
   const { theme } = useTheme();
   const isDark = theme === "dark";
 
@@ -41,11 +44,24 @@ function JobDetailPage() {
       return application;
     },
     onSuccess: () => {
+      
       setShowConfirmModal(false);
-      alert("Uspešno ste se prijavili!");
+      setShowSuccessModal(true);
     },
     onError: (error) => {
       alert("Greška: " + error.message);
+    },
+  });
+
+  const checkApplicationsMutation = useMutation({
+    mutationFn: () => fetchApplicationsByJob(jobId),
+    onSuccess: (applications) => {
+      console.log("Rezultat provere prijava:", applications);
+      if (applications.length === 0) {
+        setShowNoApplicationsModal(true);
+      } else {
+        navigate({ to: "/admin/jobs/$jobId/applications", params: { jobId } });
+      }
     },
   });
 
@@ -66,8 +82,8 @@ function JobDetailPage() {
   }
 
   const cardClass = isDark
-    ? "bg-gray-800 border border-gray-700 rounded-2xl p-8"
-    : "bg-white rounded-3xl p-8 shadow-xl shadow-purple-200/50 border border-purple-100";
+    ? "bg-gray-800 border-2 border-green-400/40 rounded-2xl p-8"
+    : "bg-white border-2 border-purple-300/50 rounded-2xl p-8 shadow-md shadow-purple-100";
 
   const buttonClass = isDark
     ? "w-full bg-green-400 text-gray-900 font-semibold py-3 rounded-xl hover:bg-green-300 transition-colors mt-4"
@@ -145,13 +161,13 @@ function JobDetailPage() {
         </div>
 
         {isAdmin ? (
-          <Link
-            to="/admin/jobs/$jobId/applications"
-            params={{ jobId }}
-            className={buttonClass + " block text-center"}
+          <button
+            onClick={() => checkApplicationsMutation.mutate()}
+            disabled={checkApplicationsMutation.isPending}
+            className={buttonClass}
           >
-            Pregledaj prijave
-          </Link>
+            {checkApplicationsMutation.isPending ? "Proveravam..." : "Pregledaj prijave"}
+          </button>
         ) : (
           <>
             <label className={`block text-sm mb-2 ${isDark ? "text-gray-300" : "text-gray-600"}`}>
@@ -199,6 +215,48 @@ function JobDetailPage() {
                 {applyMutation.isPending ? "Šaljem..." : "Da, prijavi se ponovo"}
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {showSuccessModal && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 px-4">
+          <div className={modalCardClass}>
+            <h2 className={`text-lg font-bold mb-2 ${isDark ? "text-white" : "text-gray-900"}`}>
+              Prijava uspešno poslata
+            </h2>
+            <p className={isDark ? "text-gray-300 text-sm mb-6" : "text-gray-600 text-sm mb-6"}>
+              Uspešno ste se prijavili na ovu poziciju. Status prijave možete pratiti na stranici "Moje prijave".
+            </p>
+            <button
+              onClick={() => setShowSuccessModal(false)}
+              className={isDark
+                ? "w-full bg-green-400 text-gray-900 font-medium py-2 rounded-xl hover:bg-green-300"
+                : "w-full text-white font-medium py-2 rounded-xl bg-gradient-to-r from-pink-500 to-purple-600 hover:opacity-90"}
+            >
+              U redu
+            </button>
+          </div>
+        </div>
+      )}
+
+      {showNoApplicationsModal && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 px-4">
+          <div className={modalCardClass}>
+            <h2 className={`text-lg font-bold mb-2 ${isDark ? "text-white" : "text-gray-900"}`}>
+              Nema prijava
+            </h2>
+            <p className={isDark ? "text-gray-300 text-sm mb-6" : "text-gray-600 text-sm mb-6"}>
+              Za ovaj oglas trenutno nema nijedne prijave.
+            </p>
+            <button
+              onClick={() => setShowNoApplicationsModal(false)}
+              className={isDark
+                ? "w-full bg-green-400 text-gray-900 font-medium py-2 rounded-xl hover:bg-green-300"
+                : "w-full text-white font-medium py-2 rounded-xl bg-gradient-to-r from-pink-500 to-purple-600 hover:opacity-90"}
+            >
+              U redu
+            </button>
           </div>
         </div>
       )}

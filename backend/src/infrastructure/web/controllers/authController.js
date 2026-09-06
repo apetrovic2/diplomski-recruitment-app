@@ -3,12 +3,14 @@ import { LoginUser } from "../../../application/use-cases/LoginUser.js";
 import { MongoUserRepository } from "../../database/mongoose/repositories/MongoUserRepository.js";
 import { UploadUserCv } from "../../../application/use-cases/UploadUserCv.js";
 import { DeleteUserCv } from "../../../application/use-cases/DeleteUserCv.js";
+import { GetUserById } from "../../../application/use-cases/GetUserById.js";
 
 const userRepository = new MongoUserRepository();
 const registerUserUseCase = new RegisterUser(userRepository);
 const loginUserUseCase = new LoginUser(userRepository);
 const uploadUserCvUseCase = new UploadUserCv(userRepository);
 const deleteUserCvUseCase = new DeleteUserCv(userRepository);
+const getUserByIdUseCase = new GetUserById(userRepository);
 
 export async function register(req, res){
     try{
@@ -19,7 +21,7 @@ export async function register(req, res){
             id: newUser.id,
             name: newUser.name,
             email: newUser.email,
-            role: newUser.role,
+            role: newUser.role
         });
     } catch(error){
         res.status(400).json({message: error.message});
@@ -37,6 +39,7 @@ export async function login(req, res){
                 name:user.name,
                 email:user.email,
                 role:user.role,
+                cvUrl: user.cvUrl
             },
         });
     } catch(error){
@@ -68,3 +71,16 @@ export async function deleteUserCv(req, res) {
   }
 }
 
+export async function getUserById(req, res) {
+  try {
+    const { userId } = req.params;
+    const user = await getUserByIdUseCase.execute(userId);
+    res.status(200).json({
+      id: user._id,
+      name: user.name,
+      email: user.email,
+    });
+  } catch (error) {
+    res.status(404).json({ message: error.message });
+  }
+}

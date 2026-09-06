@@ -48,6 +48,10 @@ function CreateJobPage() {
     createJobMutation.mutate();
   }
 
+  const cardClass = isDark
+    ? "bg-gray-800 border-2 border-green-400/40 rounded-2xl p-8"
+    : "bg-white border-2 border-purple-300/50 rounded-2xl p-8 shadow-md shadow-purple-100";
+
   const inputClass = isDark
     ? "w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-3 text-white placeholder:text-gray-500 outline-none focus:border-green-400"
     : "w-full bg-white border border-purple-100 rounded-2xl px-4 py-3 text-gray-900 placeholder:text-gray-400 outline-none focus:border-purple-400 shadow-sm";
@@ -59,87 +63,91 @@ function CreateJobPage() {
   const labelClass = isDark ? "text-sm text-gray-300 mb-1 block" : "text-sm text-gray-600 mb-1 block";
 
   return (
-    <div className="max-w-lg mx-auto px-6 py-16">
-      <h1 className={`text-2xl font-bold text-center mb-8 ${isDark ? "text-white" : "text-gray-900"}`}>
-        Kreiraj novi oglas
-      </h1>
-      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-        <div>
-          <label className={labelClass}>Naziv pozicije</label>
-          <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} className={inputClass} />
-        </div>
+    <div className="max-w-2xl mx-auto px-6 py-16">
+      <div className={cardClass}>
+        <h1 className={`text-2xl font-bold text-center mb-8 ${isDark ? "text-white" : "text-gray-900"}`}>
+          Kreiraj novi oglas
+        </h1>
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+          <div>
+            <label className={labelClass}>Naziv pozicije</label>
+            <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} className={inputClass} />
+          </div>
 
-        <div>
-          <label className={labelClass}>Kompanija</label>
-          <input type="text" value={company} onChange={(e) => setCompany(e.target.value)} className={inputClass} />
-        </div>
+          <div>
+            <label className={labelClass}>Kompanija</label>
+            <input type="text" value={company} onChange={(e) => setCompany(e.target.value)} className={inputClass} />
+          </div>
 
-        <div>
-          <label className={labelClass}>Način rada</label>
-          <select value={workArrangement} onChange={(e) => setWorkArrangement(e.target.value)} className={inputClass}>
-            {workArrangements.map((opt) => <option key={opt} value={opt}>{opt}</option>)}
-          </select>
-        </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className={labelClass}>Način rada</label>
+              <select value={workArrangement} onChange={(e) => setWorkArrangement(e.target.value)} className={inputClass}>
+                {workArrangements.map((opt) => <option key={opt} value={opt}>{opt}</option>)}
+              </select>
+            </div>
 
-        <div>
-          <label className={labelClass}>Oblast rada</label>
-          <select value={field} onChange={(e) => setField(e.target.value)} className={inputClass}>
-            {fields.map((opt) => <option key={opt} value={opt}>{opt}</option>)}
-          </select>
-        </div>
+            <div>
+              <label className={labelClass}>Oblast rada</label>
+              <select value={field} onChange={(e) => setField(e.target.value)} className={inputClass}>
+                {fields.map((opt) => <option key={opt} value={opt}>{opt}</option>)}
+              </select>
+            </div>
 
-        <div>
-          <label className={labelClass}>Grad</label>
-          <select value={city} onChange={(e) => setCity(e.target.value)} className={inputClass}>
-            {cities.map((opt) => <option key={opt} value={opt}>{opt}</option>)}
-          </select>
-        </div>
+            <div>
+              <label className={labelClass}>Grad</label>
+              <select value={city} onChange={(e) => setCity(e.target.value)} className={inputClass}>
+                {cities.map((opt) => <option key={opt} value={opt}>{opt}</option>)}
+              </select>
+            </div>
 
-        <div>
-          <label className={labelClass}>Stručna sprema</label>
-          <select value={educationLevel} onChange={(e) => setEducationLevel(e.target.value)} className={inputClass}>
-            {educationLevels.map((opt) => <option key={opt} value={opt}>{opt}</option>)}
-          </select>
-        </div>
+            <div>
+              <label className={labelClass}>Stručna sprema</label>
+              <select value={educationLevel} onChange={(e) => setEducationLevel(e.target.value)} className={inputClass}>
+                {educationLevels.map((opt) => <option key={opt} value={opt}>{opt}</option>)}
+              </select>
+            </div>
 
-        <div>
-          <label className={labelClass}>Tip zaposlenja</label>
-          <select value={employmentType} onChange={(e) => setEmploymentType(e.target.value)} className={inputClass}>
-            {employmentTypes.map((opt) => <option key={opt} value={opt}>{opt}</option>)}
-          </select>
-        </div>
+            <div>
+              <label className={labelClass}>Tip zaposlenja</label>
+              <select value={employmentType} onChange={(e) => setEmploymentType(e.target.value)} className={inputClass}>
+                {employmentTypes.map((opt) => <option key={opt} value={opt}>{opt}</option>)}
+              </select>
+            </div>
 
-        <div>
-          <label className={labelClass}>Radno vreme</label>
-          <select value={workHours} onChange={(e) => setWorkHours(e.target.value)} className={inputClass}>
-            {workHoursOptions.map((opt) => <option key={opt} value={opt}>{opt}</option>)}
-          </select>
-        </div>
+            <div>
+              <label className={labelClass}>Radno vreme</label>
+              <select value={workHours} onChange={(e) => setWorkHours(e.target.value)} className={inputClass}>
+                {workHoursOptions.map((opt) => <option key={opt} value={opt}>{opt}</option>)}
+              </select>
+            </div>
 
-        <div>
-          <label className={labelClass}>Nivo iskustva</label>
-          <select value={experienceLevel} onChange={(e) => setExperienceLevel(e.target.value)} className={inputClass}>
-            {experienceLevels.map((opt) => <option key={opt} value={opt}>{opt}</option>)}
-          </select>
-        </div>
+            <div>
+              <label className={labelClass}>Nivo iskustva</label>
+              <select value={experienceLevel} onChange={(e) => setExperienceLevel(e.target.value)} className={inputClass}>
+                {experienceLevels.map((opt) => <option key={opt} value={opt}>{opt}</option>)}
+              </select>
+            </div>
 
-        <div>
-          <label className={labelClass}>Rok za prijavu</label>
-          <input
-            type="date"
-            value={applicationDeadline}
-            onChange={(e) => setApplicationDeadline(e.target.value)}
-            className={inputClass}
-          />
-        </div>
+            <div>
+              <label className={labelClass}>Rok za prijavu</label>
+              <input
+                type="date"
+                value={applicationDeadline}
+                onChange={(e) => setApplicationDeadline(e.target.value)}
+                className={inputClass}
+              />
+            </div>
+          </div>
 
-        <button type="submit" disabled={createJobMutation.isPending} className={buttonClass}>
-          {createJobMutation.isPending ? "Kreiram..." : "Kreiraj oglas"}
-        </button>
-        {createJobMutation.isError && (
-          <p className="text-red-500 text-sm text-center">{createJobMutation.error.message}</p>
-        )}
-      </form>
+          <button type="submit" disabled={createJobMutation.isPending} className={buttonClass}>
+            {createJobMutation.isPending ? "Kreiram..." : "Kreiraj oglas"}
+          </button>
+          {createJobMutation.isError && (
+            <p className="text-red-500 text-sm text-center">{createJobMutation.error.message}</p>
+          )}
+        </form>
+      </div>
     </div>
   );
 }

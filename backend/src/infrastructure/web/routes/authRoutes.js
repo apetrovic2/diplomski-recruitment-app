@@ -1,8 +1,8 @@
 import { Router } from "express";
-import { register, login, uploadUserCv, deleteUserCv } from "../controllers/authController.js";
+import { register, login, uploadUserCv, deleteUserCv, getUserById } from "../controllers/authController.js";
 import upload from "../middleware/upload.js";
-import { authenticate } from "../middleware/auth.js";
- 
+import { authenticate, authorize } from "../middleware/auth.js";
+
 const router = Router();
 
 /**
@@ -62,6 +62,25 @@ router.post("/auth/register", register);
  *         description: Pogrešan email ili lozinka
  */
 router.post("/auth/login", login);
+
+/**
+ * @swagger
+ * /api/auth/{userId}:
+ *   get:
+ *     summary: Vraća osnovne podatke o korisniku (samo admin)
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Podaci o korisniku
+ *       404:
+ *         description: Korisnik nije pronađen
+ */
+router.get("/auth/:userId", authenticate, authorize("admin"), getUserById);
 
 /**
  * @swagger

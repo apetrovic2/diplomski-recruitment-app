@@ -1,6 +1,7 @@
-import { createRootRoute, Outlet, Link } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 import { useTheme } from "../context/ThemeContext";
+import { useAuth } from "../context/AuthContext";
+import { createRootRoute, Outlet, Link, useLocation } from "@tanstack/react-router";
 
 export const Route = createRootRoute({
   component: RootComponent,
@@ -8,9 +9,18 @@ export const Route = createRootRoute({
 
 function RootComponent() {
   const { theme, setTheme } = useTheme();
-  const user = JSON.parse(localStorage.getItem("user") || "{}");
+  const { user } = useAuth();
+  const location = useLocation();
 
   const isDark = theme === "dark";
+
+  function linkClass(path: string) {
+    const isActive = location.pathname === path;
+    if (isActive) {
+      return isDark ? "text-white font-semibold" : "text-gray-900 font-semibold";
+    }
+    return isDark ? "text-gray-300" : "text-gray-600";
+  }
 
   return (
     <div className={isDark ? "min-h-screen bg-gray-900 text-white" : "min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50"}>
@@ -20,32 +30,27 @@ function RootComponent() {
         }`}
       >
         <div className="flex items-center gap-4">
-          <Link to="/jobs" className={isDark ? "text-white font-semibold" : "text-gray-900 font-semibold"}>
+          <Link to="/jobs" className={linkClass("/jobs")}>
             Poslovni Put
           </Link>
-          {user.role === "candidate" && (
-            <Link to="/my-applications" className={isDark ? "text-gray-300" : "text-gray-600"}>
+          {user?.role === "candidate" && (
+            <Link to="/my-applications" className={linkClass("/my-applications")}>
               Moje prijave
             </Link>
           )}
-          {user.role === "admin" && (
-            <Link to="/admin/create-job" className={isDark ? "text-gray-300" : "text-gray-600"}>
+          {user?.role === "admin" && (
+            <Link to="/admin/create-job" className={linkClass("/admin/create-job")}>
               Kreiraj oglas
             </Link>
           )}
-          {user.id ? (
-            <Link to="/profile" className={isDark ? "text-gray-300" : "text-gray-600"}>
+          {user ? (
+            <Link to="/profile" className={linkClass("/profile")}>
               Profil
             </Link>
           ) : (
-            <>
-              <Link to="/login" className={isDark ? "text-gray-300" : "text-gray-600"}>
-                Prijava
-              </Link>
-              <Link to="/register" className={isDark ? "text-gray-300" : "text-gray-600"}>
-                Registracija
-              </Link>
-            </>
+            <Link to="/login" className={linkClass("/login")}>
+              Prijava
+            </Link>
           )}
         </div>
 

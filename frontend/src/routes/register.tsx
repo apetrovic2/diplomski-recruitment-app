@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { register } from "../api/auth";
 import { useTheme } from "../context/ThemeContext";
+import { useAuth } from "../context/AuthContext";
 
 export const Route = createFileRoute("/register")({
   component: RegisterPage,
@@ -17,12 +18,12 @@ function RegisterPage() {
   const { theme } = useTheme();
   const isDark = theme === "dark";
   const [confirmPassword, setConfirmPassword] = useState("");
+  const { login: authLogin } = useAuth();
 
   const registerMutation = useMutation({
     mutationFn: () => register({ name, email, password, role }),
     onSuccess: (result) => {
-      localStorage.setItem("token", result.token);
-      localStorage.setItem("user", JSON.stringify(result.user));
+      authLogin(result.token, result.user);
       navigate({ to: "/jobs" });
     },
   });
