@@ -5,8 +5,8 @@
       this.jobRepository = jobRepository;
     }
 
-    async execute(title, company, workArrangement, field, city, educationLevel, employmentType, workHours, experienceLevel, applicationDeadline) {
-      const job = new JobListing(title, company, workArrangement, field, city, educationLevel, employmentType, workHours, experienceLevel, applicationDeadline);
+    async execute(title, company, workArrangement, field, city, educationLevel, employmentType, workHours, experienceLevel, applicationDeadline, createdBy) {
+      const job = new JobListing(title, company, workArrangement, field, city, educationLevel, employmentType, workHours, experienceLevel, applicationDeadline, createdBy);
       const savedJob = await this.jobRepository.save(job);
       return savedJob;
     }

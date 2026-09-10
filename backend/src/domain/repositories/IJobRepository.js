@@ -8,4 +8,7 @@ export class IJobRepository {
    async findById(id) {
     throw new Error("Metoda findById() nije implementirana");
   }
+  async deleteJob(id) {
+  throw new Error("Metoda deleteJob() nije implementirana");
+}
 }

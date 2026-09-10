@@ -6,6 +6,7 @@ import {
   changeApplicationStatus,
   scheduleInterview,
   rateCandidate,
+  useProfileCv,
 } from "../controllers/applicationController.js";
 import upload from "../middleware/upload.js";
 import { uploadCv } from "../controllers/applicationController.js";
@@ -52,7 +53,7 @@ router.post("/applications", authenticate, applyToJob);
  *       200:
  *         description: Lista prijava
  */
-router.get("/applications/job/:jobId", getApplicationsByJob);
+router.get("/applications/job/:jobId", authenticate, authorize("admin"), getApplicationsByJob);
 
 /**
  * @swagger
@@ -69,7 +70,7 @@ router.get("/applications/job/:jobId", getApplicationsByJob);
  *       200:
  *         description: Lista prijava
  */
-router.get("/applications/candidate/:candidateId", getApplicationsByCandidate);
+router.get("/applications/candidate/:candidateId", authenticate, getApplicationsByCandidate);
 
 /**
  * @swagger
@@ -189,5 +190,33 @@ router.put("/applications/:applicationId/rating", authenticate, authorize("admin
  *         description: Greška pri otpremanju
  */
 router.post("/applications/:applicationId/cv", authenticate, upload.single("cv"), uploadCv);
+
+/**
+ * @swagger
+ * /api/applications/{applicationId}/use-profile-cv:
+ *   put:
+ *     summary: Povezuje postojeći CV sa profila kandidata sa prijavom
+ *     parameters:
+ *       - in: path
+ *         name: applicationId
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               cvUrl:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: CV povezan sa prijavom
+ *       400:
+ *         description: Greška u podacima
+ */
+router.put("/applications/:applicationId/use-profile-cv", authenticate, useProfileCv);
 
 export default router;

@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { createJob, getAllJobs, getJobById } from "../controllers/jobController.js";
+import { createJob, getAllJobs, getJobById, deleteJob } from "../controllers/jobController.js";
 import { authenticate, authorize } from "../middleware/auth.js";
 
 const router = Router();
@@ -59,5 +59,24 @@ router.get("/jobs", getAllJobs);
  *         description: Oglas nije pronađen
  */
 router.get("/jobs/:id", getJobById);
+
+/**
+ * @swagger
+ * /api/jobs/{id}:
+ *   delete:
+ *     summary: Briše oglas po ID-u (samo admin)
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Oglas obrisan
+ *       404:
+ *         description: Oglas nije pronađen
+ */
+router.delete("/jobs/:id", authenticate, authorize("admin"), deleteJob);
 
 export default router;

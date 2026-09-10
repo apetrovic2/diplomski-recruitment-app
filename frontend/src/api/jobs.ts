@@ -5,6 +5,7 @@ export interface Job {
   title: string;
   company: string;
   status: string;
+  createdBy?: string;
   workArrangement?: string;
   field?: string;
   city?: string;
@@ -21,6 +22,10 @@ export async function fetchJobs(): Promise<Job[]> {
 
 export async function fetchJobById(jobId: string): Promise<Job> {
   return apiFetch(`/jobs/${jobId}`);
+}
+
+export async function deleteJob(jobId: string): Promise<{ message: string }> {
+  return apiFetch(`/jobs/${jobId}`, { method: "DELETE" });
 }
 
 export async function createJob(data: {

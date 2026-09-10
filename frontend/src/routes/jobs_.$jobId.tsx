@@ -2,8 +2,10 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useState } from "react";
 import { fetchJobById } from "../api/jobs";
-import { applyToJob, uploadCv, fetchMyApplications, fetchApplicationsByJob } from "../api/applications";
+import { applyToJob, uploadCv, fetchMyApplications, fetchApplicationsByJob, useProfileCv } from "../api/applications";
+import { uploadUserCv } from "../api/auth";
 import { useTheme } from "../context/ThemeContext";
+import { useAuth } from "../context/AuthContext";
 
 export const Route = createFileRoute("/jobs_/$jobId")({
   component: JobDetailPage,
@@ -16,11 +18,17 @@ function JobDetailPage() {
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [showNoApplicationsModal, setShowNoApplicationsModal] = useState(false);
+  const [showApplyModal, setShowApplyModal] = useState(false);
   const { theme } = useTheme();
   const isDark = theme === "dark";
+  const { login: authLogin } = useAuth();
 
   const user = JSON.parse(localStorage.getItem("user") || "{}");
   const isAdmin = user.role === "admin";
+
+  const [cvChoice, setCvChoice] = useState<"profile" | "new">(user.cvUrl ? "profile" : "new");
+  const [saveToProfile, setSaveToProfile] = useState(false);
+  const [showNoCvConfirmModal, setShowNoCvConfirmModal] = useState(false);
 
   const { data, isLoading, error } = useQuery({
     queryKey: ["job", jobId],
@@ -38,14 +46,27 @@ function JobDetailPage() {
   const applyMutation = useMutation({
     mutationFn: async () => {
       const application = await applyToJob(jobId, user.id);
-      if (cvFile) {
+
+      if (cvChoice === "profile" && user.cvUrl) {
+        await useProfileCv(application._id, user.cvUrl);
+      } else if (cvChoice === "new" && cvFile) {
         await uploadCv(application._id, cvFile);
+        if (saveToProfile) {
+          const result = await uploadUserCv(user.id, cvFile);
+          const token = localStorage.getItem("token");
+          const updatedUser = { ...user, cvUrl: result.cvUrl };
+          if (token) {
+            authLogin(token, updatedUser);
+          }
+        }
       }
+
       return application;
     },
     onSuccess: () => {
-      
       setShowConfirmModal(false);
+      setShowNoCvConfirmModal(false);
+      setShowApplyModal(false);
       setShowSuccessModal(true);
     },
     onError: (error) => {
@@ -56,7 +77,6 @@ function JobDetailPage() {
   const checkApplicationsMutation = useMutation({
     mutationFn: () => fetchApplicationsByJob(jobId),
     onSuccess: (applications) => {
-      console.log("Rezultat provere prijava:", applications);
       if (applications.length === 0) {
         setShowNoApplicationsModal(true);
       } else {
@@ -65,11 +85,21 @@ function JobDetailPage() {
     },
   });
 
-  function handleApplyClick() {
+  function handleSubmitFromModal() {
+    const willHaveCv = (cvChoice === "profile" && user.cvUrl) || (cvChoice === "new" && cvFile);
+
+    if (!willHaveCv) {
+      setShowApplyModal(false);
+      setShowNoCvConfirmModal(true);
+      return;
+    }
+
     if (alreadyApplied) {
+      setShowApplyModal(false);
       setShowConfirmModal(true);
       return;
     }
+
     applyMutation.mutate();
   }
 
@@ -161,31 +191,110 @@ function JobDetailPage() {
         </div>
 
         {isAdmin ? (
-          <button
-            onClick={() => checkApplicationsMutation.mutate()}
-            disabled={checkApplicationsMutation.isPending}
-            className={buttonClass}
-          >
-            {checkApplicationsMutation.isPending ? "Proveravam..." : "Pregledaj prijave"}
-          </button>
-        ) : (
-          <>
-            <label className={`block text-sm mb-2 ${isDark ? "text-gray-300" : "text-gray-600"}`}>
-              Otpremi CV (PDF)
-            </label>
-            <input
-              type="file"
-              accept="application/pdf"
-              onChange={(e) => setCvFile(e.target.files?.[0] || null)}
-              className={isDark ? "text-gray-300" : "text-gray-600"}
-            />
-
-            <button onClick={handleApplyClick} disabled={applyMutation.isPending} className={buttonClass}>
-              {applyMutation.isPending ? "Šaljem prijavu..." : "Prijavi se na poziciju"}
+          data?.createdBy === user.id ? (
+            <button
+              onClick={() => checkApplicationsMutation.mutate()}
+              disabled={checkApplicationsMutation.isPending}
+              className={buttonClass}
+            >
+              {checkApplicationsMutation.isPending ? "Proveravam..." : "Pregledaj prijave"}
             </button>
-          </>
+          ) : (
+            <p className={isDark ? "text-gray-400 text-sm" : "text-gray-500 text-sm"}>
+             
+            </p>
+          )
+        ) : (
+          <button onClick={() => setShowApplyModal(true)} className={buttonClass}>
+            Prijavi se na poziciju
+          </button>
         )}
       </div>
+
+      {showApplyModal && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 px-4">
+          <div className={modalCardClass}>
+            <h2 className={`text-lg font-bold mb-4 ${isDark ? "text-white" : "text-gray-900"}`}>
+              Prijava na poziciju
+            </h2>
+
+            <p className={`text-sm font-medium mb-2 ${isDark ? "text-gray-300" : "text-gray-700"}`}>
+              CV za prijavu
+            </p>
+
+            {user.cvUrl && (
+              <label className="flex items-center gap-2 mb-2 cursor-pointer">
+                <input type="radio" checked={cvChoice === "profile"} onChange={() => setCvChoice("profile")} />
+                <span className={isDark ? "text-gray-300 text-sm" : "text-gray-600 text-sm"}>
+                  Koristi CV sa profila
+                </span>
+              </label>
+            )}
+
+            <label className="flex items-center gap-2 mb-2 cursor-pointer">
+              <input type="radio" checked={cvChoice === "new"} onChange={() => setCvChoice("new")} />
+              <span className={isDark ? "text-gray-300 text-sm" : "text-gray-600 text-sm"}>
+                Otpremi novi CV
+              </span>
+            </label>
+
+            {cvChoice === "new" && (
+              <div className="ml-6 mt-2 mb-4">
+                <label
+                  className={isDark
+                    ? "inline-block cursor-pointer bg-gray-700 text-gray-200 text-sm px-4 py-2 rounded-xl hover:bg-gray-600 transition-colors"
+                    : "inline-block cursor-pointer bg-purple-50 text-purple-700 text-sm px-4 py-2 rounded-xl hover:bg-purple-100 transition-colors"}
+                >
+                  Izaberi fajl (PDF)
+                  <input
+                    type="file"
+                    accept="application/pdf"
+                    onChange={(e) => setCvFile(e.target.files?.[0] || null)}
+                    className="hidden"
+                  />
+                </label>
+
+                {cvFile && (
+                  <p className={isDark ? "text-gray-400 text-xs mt-2" : "text-gray-500 text-xs mt-2"}>
+                    Izabrano: {cvFile.name}
+                  </p>
+                )}
+
+                <label className="flex items-center gap-2 mt-3 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={saveToProfile}
+                    onChange={(e) => setSaveToProfile(e.target.checked)}
+                  />
+                  <span className={isDark ? "text-gray-400 text-xs" : "text-gray-500 text-xs"}>
+                    {user.cvUrl ? "Izmeni CV i na profilu" : "Sačuvaj CV i na profil"}
+                  </span>
+                </label>
+              </div>
+            )}
+
+            <div className="flex gap-3 mt-4">
+              <button
+                onClick={() => setShowApplyModal(false)}
+                className={isDark
+                  ? "flex-1 bg-gray-700 text-gray-300 py-2 rounded-xl hover:bg-gray-600"
+                  : "flex-1 bg-gray-100 text-gray-600 py-2 rounded-xl hover:bg-gray-200"}
+              >
+                Otkaži
+              </button>
+              <button
+                onClick={handleSubmitFromModal}
+                disabled={applyMutation.isPending}
+                className={isDark
+                  ? "flex-1 bg-green-400 text-gray-900 font-medium py-2 rounded-xl hover:bg-green-300"
+                  : "flex-1 text-white font-medium py-2 rounded-xl bg-gradient-to-r from-pink-500 to-purple-600 hover:opacity-90"}
+              >
+                {applyMutation.isPending ? "Šaljem..." : "Pošalji prijavu"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {showConfirmModal && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 px-4">
@@ -229,7 +338,10 @@ function JobDetailPage() {
               Uspešno ste se prijavili na ovu poziciju. Status prijave možete pratiti na stranici "Moje prijave".
             </p>
             <button
-              onClick={() => setShowSuccessModal(false)}
+              onClick={() => {
+                setShowSuccessModal(false);
+                navigate({ to: "/jobs" });
+              }}
               className={isDark
                 ? "w-full bg-green-400 text-gray-900 font-medium py-2 rounded-xl hover:bg-green-300"
                 : "w-full text-white font-medium py-2 rounded-xl bg-gradient-to-r from-pink-500 to-purple-600 hover:opacity-90"}
@@ -257,6 +369,38 @@ function JobDetailPage() {
             >
               U redu
             </button>
+          </div>
+        </div>
+      )}
+
+      {showNoCvConfirmModal && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 px-4">
+          <div className={modalCardClass}>
+            <h2 className={`text-lg font-bold mb-2 ${isDark ? "text-white" : "text-gray-900"}`}>
+              Prijava bez CV-ja
+            </h2>
+            <p className={isDark ? "text-gray-300 text-sm mb-6" : "text-gray-600 text-sm mb-6"}>
+              Niste priložili CV uz ovu prijavu. Poslodavci obično očekuju CV — da li ipak želite da nastavite bez njega?
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setShowNoCvConfirmModal(false)}
+                className={isDark
+                  ? "flex-1 bg-gray-700 text-gray-300 py-2 rounded-xl hover:bg-gray-600"
+                  : "flex-1 bg-gray-100 text-gray-600 py-2 rounded-xl hover:bg-gray-200"}
+              >
+                Vrati se
+              </button>
+              <button
+                onClick={() => applyMutation.mutate()}
+                disabled={applyMutation.isPending}
+                className={isDark
+                  ? "flex-1 bg-green-400 text-gray-900 font-medium py-2 rounded-xl hover:bg-green-300"
+                  : "flex-1 text-white font-medium py-2 rounded-xl bg-gradient-to-r from-pink-500 to-purple-600 hover:opacity-90"}
+              >
+                {applyMutation.isPending ? "Šaljem..." : "Nastavi bez CV-ja"}
+              </button>
+            </div>
           </div>
         </div>
       )}

@@ -34,7 +34,16 @@ function MyApplicationsPage() {
   const cardClass = isDark
     ? "bg-gray-800 border-2 border-green-400/40 rounded-2xl p-5"
     : "bg-white border-2 border-purple-300/50 rounded-2xl p-5 shadow-md shadow-purple-100";
-  
+
+  function CvLink({ cvUrl }: { cvUrl: string | null }) {
+    if (!cvUrl) {
+      return <>Nije otpremljen</>;
+    }
+    const fullUrl = "http://localhost:5000/" + cvUrl;
+    const linkClass = isDark ? "text-green-400 underline" : "text-purple-600 underline";
+    return <a href={fullUrl} target="_blank" rel="noopener noreferrer" className={linkClass}>Pogledaj CV</a>;
+  }
+
   return (
     <div className="max-w-2xl mx-auto px-6 py-10">
       <h1 className={`text-3xl font-bold mb-6 ${isDark ? "text-white" : "text-gray-900"}`}>Moje prijave</h1>
@@ -58,7 +67,7 @@ function MyApplicationsPage() {
               </p>
               <p className={isDark ? "text-gray-300" : "text-gray-700"}>Status: {app.status}</p>
               <p className={isDark ? "text-gray-400 text-sm" : "text-gray-500 text-sm"}>
-                CV: {app.cvUrl ? "Otpremljen" : "Nije otpremljen"}
+                CV: <CvLink cvUrl={app.cvUrl} />
               </p>
               {app.interviewDate && (
                 <p className={isDark ? "text-green-400 text-sm mt-1" : "text-green-600 text-sm mt-1"}>

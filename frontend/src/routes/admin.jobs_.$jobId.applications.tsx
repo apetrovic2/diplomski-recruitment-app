@@ -37,12 +37,18 @@ function JobApplicationsPage() {
   const [interviewInputs, setInterviewInputs] = useState<Record<string, string>>({});
   const [ratingInputs, setRatingInputs] = useState<Record<string, { rating: string; note: string }>>({});
   const [savedRatingInfo, setSavedRatingInfo] = useState<{ rating: number; note: string } | null>(null);
+  const [savedInterviewInfo, setSavedInterviewInfo] = useState<string | null>(null);
+  const [interviewError, setInterviewError] = useState<string | null>(null);
 
   const interviewMutation = useMutation({
     mutationFn: ({ applicationId, interviewDate }: { applicationId: string; interviewDate: string }) =>
       scheduleInterview(applicationId, interviewDate),
-    onSuccess: () => {
+    onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ["applications", jobId] });
+      setSavedInterviewInfo(variables.interviewDate);
+    },
+    onError: (error) => {
+      setInterviewError(error.message);
     },
   });
 
@@ -255,6 +261,47 @@ function JobApplicationsPage() {
             )}
             <button
               onClick={() => setSavedRatingInfo(null)}
+              className={isDark
+                ? "w-full bg-green-400 text-gray-900 font-medium py-2 rounded-xl hover:bg-green-300"
+                : "w-full text-white font-medium py-2 rounded-xl bg-gradient-to-r from-pink-500 to-purple-600 hover:opacity-90"}
+            >
+              U redu
+            </button>
+          </div>
+        </div>
+      )}
+      {interviewError && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 px-4">
+          <div className={modalCardClass}>
+            <h2 className={`text-lg font-bold mb-2 ${isDark ? "text-white" : "text-gray-900"}`}>
+              Greška
+            </h2>
+            <p className={isDark ? "text-gray-300 text-sm mb-6" : "text-gray-600 text-sm mb-6"}>
+              {interviewError}
+            </p>
+            <button
+              onClick={() => setInterviewError(null)}
+              className={isDark
+                ? "w-full bg-green-400 text-gray-900 font-medium py-2 rounded-xl hover:bg-green-300"
+                : "w-full text-white font-medium py-2 rounded-xl bg-gradient-to-r from-pink-500 to-purple-600 hover:opacity-90"}
+            >
+              U redu
+            </button>
+          </div>
+        </div>
+      )}
+
+      {savedInterviewInfo && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 px-4">
+          <div className={modalCardClass}>
+            <h2 className={`text-lg font-bold mb-2 ${isDark ? "text-white" : "text-gray-900"}`}>
+              Intervju zakazan
+            </h2>
+            <p className={isDark ? "text-gray-300 text-sm mb-6" : "text-gray-600 text-sm mb-6"}>
+              Intervju je zakazan za: <strong>{new Date(savedInterviewInfo).toLocaleString("sr-RS")}</strong>
+            </p>
+            <button
+              onClick={() => setSavedInterviewInfo(null)}
               className={isDark
                 ? "w-full bg-green-400 text-gray-900 font-medium py-2 rounded-xl hover:bg-green-300"
                 : "w-full text-white font-medium py-2 rounded-xl bg-gradient-to-r from-pink-500 to-purple-600 hover:opacity-90"}

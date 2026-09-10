@@ -66,3 +66,10 @@ export async function rateCandidate(applicationId: string, rating: number, note:
     body: JSON.stringify({ rating, note }),
   });
 }
+
+export async function useProfileCv(applicationId: string, cvUrl: string): Promise<Application> {
+  return apiFetch(`/applications/${applicationId}/use-profile-cv`, {
+    method: "PUT",
+    body: JSON.stringify({ cvUrl }),
+  });
+}

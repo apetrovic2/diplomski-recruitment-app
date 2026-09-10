@@ -4,7 +4,7 @@ import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import { useTheme } from "../context/ThemeContext";
 import { uploadUserCv, deleteUserCv } from "../api/auth";
 import { useAuth } from "../context/AuthContext";
-import { fetchJobs } from "../api/jobs";
+import { fetchJobs, deleteJob } from "../api/jobs";
 import { fetchApplicationsByJob } from "../api/applications";
 
 export const Route = createFileRoute("/profile")({
@@ -22,12 +22,15 @@ function ProfilePage() {
   const queryClient = useQueryClient();
   const [user, setUser] = useState<any>(authUser);
   const isAdmin = user?.role === "admin";
+  const [jobToDelete, setJobToDelete] = useState<string | null>(null);
 
-  const { data: jobs } = useQuery({
+  const { data: allJobs } = useQuery({
     queryKey: ["jobs"],
     queryFn: fetchJobs,
     enabled: isAdmin,
   });
+
+  const jobs = allJobs?.filter((job) => job.createdBy === user?.id);
 
   const { data: applicationCounts } = useQuery({
     queryKey: ["admin-stats", jobs?.map((j) => j._id)],
@@ -51,6 +54,14 @@ function ProfilePage() {
       } else {
         navigate({ to: "/admin/jobs/$jobId/applications", params: { jobId: applications[0].jobId } });
       }
+    },
+  });
+
+  const deleteJobMutation = useMutation({
+    mutationFn: (jobId: string) => deleteJob(jobId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["jobs"] });
+      setJobToDelete(null);
     },
   });
 
@@ -234,29 +245,37 @@ function ProfilePage() {
             <h2 className={`font-semibold mb-3 ${isDark ? "text-white" : "text-gray-900"}`}>Moji oglasi</h2>
             <div className="flex flex-col gap-2">
               {jobs?.map((job) => (
-                <button
+                <div
                   key={job._id}
-                  onClick={() => checkApplicationsMutation.mutate(job._id)}
-                  className={isDark
-                    ? "block w-full text-left bg-gray-700 rounded-xl px-4 py-3 hover:bg-gray-600 transition-colors"
-                    : "block w-full text-left bg-gray-50 rounded-xl px-4 py-3 hover:bg-gray-100 transition-colors"}
+                  className={isDark ? "bg-gray-700 rounded-xl px-4 py-3" : "bg-gray-50 rounded-xl px-4 py-3"}
                 >
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className={isDark ? "text-white font-medium" : "text-gray-900 font-medium"}>{job.title}</p>
-                      <p className={isDark ? "text-gray-400 text-sm" : "text-gray-500 text-sm"}>{job.company}</p>
+                  <button onClick={() => checkApplicationsMutation.mutate(job._id)} className="block w-full text-left">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className={isDark ? "text-white font-medium" : "text-gray-900 font-medium"}>{job.title}</p>
+                        <p className={isDark ? "text-gray-400 text-sm" : "text-gray-500 text-sm"}>{job.company}</p>
+                      </div>
+                      <span
+                        className={
+                          isDark
+                            ? "text-xs bg-gray-800 text-gray-300 px-2 py-1 rounded-full flex-shrink-0"
+                            : "text-xs bg-white text-gray-600 px-2 py-1 rounded-full shadow-sm flex-shrink-0"
+                        }
+                      >
+                        {applicationCounts?.[job._id] ?? 0} prijava
+                      </span>
                     </div>
-                    <span
-                      className={
-                        isDark
-                          ? "text-xs bg-gray-800 text-gray-300 px-2 py-1 rounded-full flex-shrink-0"
-                          : "text-xs bg-white text-gray-600 px-2 py-1 rounded-full shadow-sm flex-shrink-0"
-                      }
-                    >
-                      {applicationCounts?.[job._id] ?? 0} prijava
-                    </span>
-                  </div>
-                </button>
+                  </button>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setJobToDelete(job._id);
+                    }}
+                    className="mt-2 text-xs text-red-500 hover:text-red-600"
+                  >
+                    Obriši oglas
+                  </button>
+                </div>
               ))}
             </div>
           </div>
@@ -301,6 +320,36 @@ function ProfilePage() {
             >
               U redu
             </button>
+          </div>
+        </div>
+      )}
+
+      {jobToDelete && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 px-4">
+          <div className={modalCardClass}>
+            <h2 className={`text-lg font-bold mb-2 ${isDark ? "text-white" : "text-gray-900"}`}>
+              Obriši oglas
+            </h2>
+            <p className={isDark ? "text-gray-300 text-sm mb-6" : "text-gray-600 text-sm mb-6"}>
+              Da li ste sigurni da želite da obrišete ovaj oglas? Ova akcija se ne može poništiti.
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setJobToDelete(null)}
+                className={isDark
+                  ? "flex-1 bg-gray-700 text-gray-300 py-2 rounded-xl hover:bg-gray-600"
+                  : "flex-1 bg-gray-100 text-gray-600 py-2 rounded-xl hover:bg-gray-200"}
+              >
+                Otkaži
+              </button>
+              <button
+                onClick={() => deleteJobMutation.mutate(jobToDelete)}
+                disabled={deleteJobMutation.isPending}
+                className="flex-1 bg-red-500 text-white font-medium py-2 rounded-xl hover:bg-red-600"
+              >
+                {deleteJobMutation.isPending ? "Brišem..." : "Da, obriši"}
+              </button>
+            </div>
           </div>
         </div>
       )}

@@ -6,6 +6,9 @@ import { MongoApplicationRepository } from "../../database/mongoose/repositories
 import { UploadCV } from "../../../application/use-cases/UploadCv.js";
 import { ScheduleInterview } from "../../../application/use-cases/ScheduleInterview.js";
 import { RateCandidate } from "../../../application/use-cases/RateCandidate.js";
+import { GetJobById } from "../../../application/use-cases/GetJobById.js";
+import { MongoJobRepository } from "../../database/mongoose/repositories/MongoJobRepository.js";
+import { UseProfileCv } from "../../../application/use-cases/UseProfileCv.js";
 
 const applicationRepository = new MongoApplicationRepository();
 const applyToJobUseCase = new ApplyToJob(applicationRepository);
@@ -15,6 +18,9 @@ const changeApplicationStatusUseCase = new ChangeApplicationStatus(applicationRe
 const uploadCvUseCase = new UploadCV(applicationRepository);
 const scheduleInterviewUseCase = new ScheduleInterview(applicationRepository);
 const rateCandidateUseCase = new RateCandidate(applicationRepository);
+const jobRepository = new MongoJobRepository();
+const getJobByIdUseCase = new GetJobById(jobRepository);
+const useProfileCvUseCase = new UseProfileCv(applicationRepository);
 
 export async function applyToJob(req, res) {
   try {
@@ -29,6 +35,10 @@ export async function applyToJob(req, res) {
 export async function getApplicationsByJob(req, res) {
   try {
     const { jobId } = req.params;
+    const job = await getJobByIdUseCase.execute(jobId);
+    if (job.createdBy?.toString() !== req.user.userId) {
+      return res.status(403).json({ message: "Nemate dozvolu da pregledate prijave za ovaj oglas" });
+    }
     const applications = await getApplicationsByJobUseCase.execute(jobId);
     res.status(200).json(applications);
   } catch (error) {
@@ -89,6 +99,17 @@ export async function rateCandidate(req, res) {
     const { applicationId } = req.params;
     const { rating, note } = req.body;
     const updated = await rateCandidateUseCase.execute(applicationId, rating, note);
+    res.status(200).json(updated);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+}
+
+export async function useProfileCv(req, res) {
+  try {
+    const { applicationId } = req.params;
+    const { cvUrl } = req.body;
+    const updated = await useProfileCvUseCase.execute(applicationId, cvUrl);
     res.status(200).json(updated);
   } catch (error) {
     res.status(400).json({ message: error.message });
