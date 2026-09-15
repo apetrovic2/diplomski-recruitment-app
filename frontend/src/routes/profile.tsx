@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
 import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import { useTheme } from "../context/ThemeContext";
@@ -6,6 +6,7 @@ import { uploadUserCv, deleteUserCv } from "../api/auth";
 import { useAuth } from "../context/AuthContext";
 import { fetchJobs, deleteJob } from "../api/jobs";
 import { fetchApplicationsByJob } from "../api/applications";
+import { CvDropzone } from "../components/CvDropzone";
 
 export const Route = createFileRoute("/profile")({
   component: ProfilePage,
@@ -16,7 +17,6 @@ function ProfilePage() {
   const { user: authUser, logout } = useAuth();
   const [cvFile, setCvFile] = useState<File | null>(null);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
-  const [showNoApplicationsModal, setShowNoApplicationsModal] = useState(false);
   const { theme } = useTheme();
   const isDark = theme === "dark";
   const queryClient = useQueryClient();
@@ -44,17 +44,6 @@ function ProfilePage() {
       return counts;
     },
     enabled: isAdmin && !!jobs,
-  });
-
-  const checkApplicationsMutation = useMutation({
-    mutationFn: (jobId: string) => fetchApplicationsByJob(jobId),
-    onSuccess: (applications) => {
-      if (applications.length === 0) {
-        setShowNoApplicationsModal(true);
-      } else {
-        navigate({ to: "/admin/jobs/$jobId/applications", params: { jobId: applications[0].jobId } });
-      }
-    },
   });
 
   const deleteJobMutation = useMutation({
@@ -189,21 +178,12 @@ function ProfilePage() {
                 </button>
               )}
 
-              <label className={fileLabelClass}>
-                Izaberi fajl (PDF)
-                <input
-                  type="file"
-                  accept="application/pdf"
-                  onChange={(e) => setCvFile(e.target.files?.[0] || null)}
-                  className="hidden"
-                />
-              </label>
-
-              {cvFile && (
-                <p className={isDark ? "text-gray-400 text-xs mt-2" : "text-gray-500 text-xs mt-2"}>
-                  Izabrano: {cvFile.name}
-                </p>
-              )}
+              <CvDropzone
+                onFileSelect={(file) => setCvFile(file)}
+                selectedFileName={cvFile?.name}
+                isDark={isDark}
+                labelText="Izaberi fajl (PDF)"
+              />
 
               <br />
               <button
@@ -249,7 +229,7 @@ function ProfilePage() {
                   key={job._id}
                   className={isDark ? "bg-gray-700 rounded-xl px-4 py-3" : "bg-gray-50 rounded-xl px-4 py-3"}
                 >
-                  <button onClick={() => checkApplicationsMutation.mutate(job._id)} className="block w-full text-left">
+                  <Link to="/jobs/$jobId" params={{ jobId: job._id }} className="block w-full text-left">
                     <div className="flex items-center justify-between">
                       <div>
                         <p className={isDark ? "text-white font-medium" : "text-gray-900 font-medium"}>{job.title}</p>
@@ -265,16 +245,22 @@ function ProfilePage() {
                         {applicationCounts?.[job._id] ?? 0} prijava
                       </span>
                     </div>
-                  </button>
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setJobToDelete(job._id);
-                    }}
-                    className="mt-2 text-xs text-red-500 hover:text-red-600"
-                  >
-                    Obriši oglas
-                  </button>
+                  </Link>
+                  <div className="flex gap-3 mt-2">
+                    <Link
+                      to="/admin/edit-job/$jobId"
+                      params={{ jobId: job._id }}
+                      className={isDark ? "text-xs text-green-400 hover:text-green-300" : "text-xs text-purple-600 hover:text-purple-700"}
+                    >
+                      Izmeni oglas
+                    </Link>
+                    <button
+                      onClick={() => setJobToDelete(job._id)}
+                      className="text-xs text-red-500 hover:text-red-600"
+                    >
+                      Obriši oglas
+                    </button>
+                  </div>
                 </div>
               ))}
             </div>
@@ -293,27 +279,6 @@ function ProfilePage() {
             </p>
             <button
               onClick={() => setShowSuccessModal(false)}
-              className={isDark
-                ? "w-full bg-green-400 text-gray-900 font-medium py-2 rounded-xl hover:bg-green-300"
-                : "w-full text-white font-medium py-2 rounded-xl bg-gradient-to-r from-pink-500 to-purple-600 hover:opacity-90"}
-            >
-              U redu
-            </button>
-          </div>
-        </div>
-      )}
-
-      {showNoApplicationsModal && (
-        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 px-4">
-          <div className={modalCardClass}>
-            <h2 className={`text-lg font-bold mb-2 ${isDark ? "text-white" : "text-gray-900"}`}>
-              Nema prijava
-            </h2>
-            <p className={isDark ? "text-gray-300 text-sm mb-6" : "text-gray-600 text-sm mb-6"}>
-              Za ovaj oglas trenutno nema nijedne prijave.
-            </p>
-            <button
-              onClick={() => setShowNoApplicationsModal(false)}
               className={isDark
                 ? "w-full bg-green-400 text-gray-900 font-medium py-2 rounded-xl hover:bg-green-300"
                 : "w-full text-white font-medium py-2 rounded-xl bg-gradient-to-r from-pink-500 to-purple-600 hover:opacity-90"}

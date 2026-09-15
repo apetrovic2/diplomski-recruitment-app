@@ -1,12 +1,12 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
-import { useMutation } from "@tanstack/react-query";
-import { createJob } from "../api/jobs";
+import { useState, useEffect } from "react";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { fetchJobById, updateJob } from "../api/jobs";
 import { useTheme } from "../context/ThemeContext";
 import { CityAutocomplete } from "../components/CityAutocomplete";
 
-export const Route = createFileRoute("/admin/create-job")({
-  component: CreateJobPage,
+export const Route = createFileRoute("/admin/edit-job/$jobId")({
+  component: EditJobPage,
 });
 
 const workArrangements = ["U kancelariji", "Na terenu", "Hibridno", "Remote"];
@@ -25,7 +25,17 @@ const employmentTypes = ["Ugovor na neodređeno", "Ugovor na određeno", "Honora
 const workHoursOptions = ["Puno radno vreme", "Nepuno radno vreme"];
 const experienceLevels = ["Pripravnik", "Junior", "Medior", "Senior"];
 
-function CreateJobPage() {
+function EditJobPage() {
+  const { jobId } = Route.useParams();
+  const navigate = useNavigate();
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
+
+  const { data: job, isLoading } = useQuery({
+    queryKey: ["job", jobId],
+    queryFn: () => fetchJobById(jobId),
+  });
+
   const [title, setTitle] = useState("");
   const [company, setCompany] = useState("");
   const [description, setDescription] = useState("");
@@ -39,24 +49,34 @@ function CreateJobPage() {
   const [applicationDeadline, setApplicationDeadline] = useState("");
   const [attemptedSubmit, setAttemptedSubmit] = useState(false);
 
-  const navigate = useNavigate();
-  const { theme } = useTheme();
-  const isDark = theme === "dark";
+  useEffect(() => {
+    if (job) {
+      setTitle(job.title || "");
+      setCompany(job.company || "");
+      setDescription(job.description || "");
+      setWorkArrangement(job.workArrangement || workArrangements[0]);
+      setField(job.field || fields[0]);
+      setCity(job.city || "");
+      setEducationLevel(job.educationLevel || educationLevels[0]);
+      setEmploymentType(job.employmentType || employmentTypes[0]);
+      setWorkHours(job.workHours || workHoursOptions[0]);
+      setExperienceLevel(job.experienceLevel || experienceLevels[0]);
+      setApplicationDeadline(job.applicationDeadline ? job.applicationDeadline.split("T")[0] : "");
+    }
+  }, [job]);
 
   const titleEmpty = title.trim() === "";
   const companyEmpty = company.trim() === "";
-  const deadlineInPast =
-    applicationDeadline !== "" && new Date(applicationDeadline) < new Date(new Date().toDateString());
-  const isFormValid = !titleEmpty && !companyEmpty && !deadlineInPast;
+  const isFormValid = !titleEmpty && !companyEmpty;
 
-  const createJobMutation = useMutation({
+  const updateJobMutation = useMutation({
     mutationFn: () =>
-      createJob({
+      updateJob(jobId, {
         title, company, description, workArrangement, field, city,
         educationLevel, employmentType, workHours, experienceLevel, applicationDeadline,
       }),
     onSuccess: () => {
-      navigate({ to: "/jobs" });
+      navigate({ to: "/jobs/$jobId", params: { jobId } });
     },
   });
 
@@ -66,7 +86,7 @@ function CreateJobPage() {
     if (!isFormValid) {
       return;
     }
-    createJobMutation.mutate();
+    updateJobMutation.mutate();
   }
 
   const cardClass = isDark
@@ -83,11 +103,15 @@ function CreateJobPage() {
 
   const labelClass = isDark ? "text-sm text-gray-300 mb-1 block" : "text-sm text-gray-600 mb-1 block";
 
+  if (isLoading) {
+    return <p className={isDark ? "text-white p-6" : "text-gray-900 p-6"}>Učitavanje...</p>;
+  }
+
   return (
     <div className="max-w-2xl mx-auto px-6 py-16">
       <div className={cardClass}>
         <h1 className={`text-2xl font-bold text-center mb-8 ${isDark ? "text-white" : "text-gray-900"}`}>
-          Kreiraj novi oglas
+          Izmeni oglas
         </h1>
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <div>
@@ -116,7 +140,6 @@ function CreateJobPage() {
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               rows={4}
-              placeholder="Opišite bliže o kakvom poslu je reč, koje se tehnologije koriste, i slično..."
               className={inputClass}
             />
           </div>
@@ -138,13 +161,7 @@ function CreateJobPage() {
 
             <div>
               <label className={labelClass}>Grad</label>
-              <CityAutocomplete
-                cities={cities}
-                value={city}
-                onChange={setCity}
-                isDark={isDark}
-                inputClass={inputClass}
-              />
+              <CityAutocomplete cities={cities} value={city} onChange={setCity} isDark={isDark} inputClass={inputClass} />
             </div>
 
             <div>
@@ -183,17 +200,14 @@ function CreateJobPage() {
                 onChange={(e) => setApplicationDeadline(e.target.value)}
                 className={inputClass}
               />
-              {attemptedSubmit && deadlineInPast && (
-                <p className="text-red-500 text-xs mt-1">Rok za prijavu ne može biti u prošlosti</p>
-              )}
             </div>
           </div>
 
-          <button type="submit" disabled={createJobMutation.isPending} className={buttonClass}>
-            {createJobMutation.isPending ? "Kreiram..." : "Kreiraj oglas"}
+          <button type="submit" disabled={updateJobMutation.isPending} className={buttonClass}>
+            {updateJobMutation.isPending ? "Čuvam..." : "Sačuvaj izmene"}
           </button>
-          {createJobMutation.isError && (
-            <p className="text-red-500 text-sm text-center">{createJobMutation.error.message}</p>
+          {updateJobMutation.isError && (
+            <p className="text-red-500 text-sm text-center">{updateJobMutation.error.message}</p>
           )}
         </form>
       </div>

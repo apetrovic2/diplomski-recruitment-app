@@ -24,7 +24,8 @@ const jobSchema = new mongoose.Schema({
     enum: ["Pripravnik", "Junior", "Medior", "Senior"],
   },
   applicationDeadline: { type: Date },
-  createdBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" }
+  createdBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+  description: { type: String },
 }, { timestamps: true });
 
 export const JobListingModel = mongoose.model("JobListing", jobSchema);

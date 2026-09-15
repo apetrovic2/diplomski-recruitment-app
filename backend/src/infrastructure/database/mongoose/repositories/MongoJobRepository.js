@@ -16,6 +16,7 @@ export class MongoJobRepository extends IJobRepository {
       experienceLevel: jobListing.experienceLevel,
       applicationDeadline: jobListing.applicationDeadline,
       createdBy: jobListing.createdBy,
+      description: jobListing.description,
     });
     return created;
   }
@@ -27,7 +28,12 @@ export class MongoJobRepository extends IJobRepository {
   async findById(id) {
     return await JobListingModel.findById(id);
   }
+  
   async deleteJob(id) {
   return await JobListingModel.findByIdAndDelete(id);
-}
+  }
+
+  async updateJob(id, data) {
+    return await JobListingModel.findByIdAndUpdate(id, data, { new: true });
+  }
 }

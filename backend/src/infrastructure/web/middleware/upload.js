@@ -16,7 +16,10 @@ const upload = multer({
   storage: storage,
   limits: { fileSize: 5 * 1024 * 1024 },
   fileFilter: function (req, file, cb) {
-    if (file.mimetype === "application/pdf") {
+    const isValidMimeType = file.mimetype === "application/pdf" || file.mimetype === "application/x-pdf";
+    const isValidExtension = path.extname(file.originalname).toLowerCase() === ".pdf";
+
+    if (isValidMimeType || isValidExtension) {
       cb(null, true);
     } else {
       cb(new Error("Samo PDF fajlovi su dozvoljeni"), false);

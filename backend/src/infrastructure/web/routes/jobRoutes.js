@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { createJob, getAllJobs, getJobById, deleteJob } from "../controllers/jobController.js";
+import { createJob, getAllJobs, getJobById, deleteJob, updateJob } from "../controllers/jobController.js";
 import { authenticate, authorize } from "../middleware/auth.js";
 
 const router = Router();
@@ -78,5 +78,7 @@ router.get("/jobs/:id", getJobById);
  *         description: Oglas nije pronađen
  */
 router.delete("/jobs/:id", authenticate, authorize("admin"), deleteJob);
+
+router.put("/jobs/:id", authenticate, authorize("admin"), updateJob);
 
 export default router;

@@ -22,6 +22,8 @@ function RootComponent() {
     return isDark ? "text-gray-300" : "text-gray-600";
   }
 
+  const initials = user?.name?.split(" ").map((n: string) => n[0]).join("").slice(0, 2).toUpperCase();
+
   return (
     <div className={isDark ? "min-h-screen bg-gray-900 text-white" : "min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50"}>
       <nav
@@ -31,7 +33,7 @@ function RootComponent() {
       >
         <div className="flex items-center gap-4">
           <Link to="/jobs" className={linkClass("/jobs")}>
-            Poslovni Put
+              Pregled oglasa
           </Link>
           {user?.role === "candidate" && (
             <Link to="/my-applications" className={linkClass("/my-applications")}>
@@ -43,9 +45,21 @@ function RootComponent() {
               Kreiraj oglas
             </Link>
           )}
+        </div>
+
+        <div>
           {user ? (
-            <Link to="/profile" className={linkClass("/profile")}>
-              Profil
+            <Link to="/profile" className="flex items-center gap-2">
+              <div
+                className={
+                  isDark
+                    ? "w-8 h-8 rounded-full bg-green-400 text-gray-900 flex items-center justify-center text-xs font-bold"
+                    : "w-8 h-8 rounded-full bg-gradient-to-br from-pink-500 to-purple-600 text-white flex items-center justify-center text-xs font-bold"
+                }
+              >
+                {initials}
+              </div>
+              <span className={linkClass("/profile")}>{user.name}</span>
             </Link>
           ) : (
             <Link to="/login" className={linkClass("/login")}>
@@ -53,8 +67,12 @@ function RootComponent() {
             </Link>
           )}
         </div>
+      </nav>
 
-        <div className={`flex items-center gap-1 p-1 rounded-full ${isDark ? "bg-gray-800" : "bg-white shadow-sm"}`}>
+      <Outlet />
+
+      <div className="fixed bottom-6 right-6 z-40">
+        <div className={`flex items-center gap-1 p-1 rounded-full ${isDark ? "bg-gray-800 shadow-lg" : "bg-white shadow-lg"}`}>
           <button
             onClick={() => setTheme("dark")}
             className={`text-xs font-medium px-3 py-1.5 rounded-full ${
@@ -72,9 +90,8 @@ function RootComponent() {
             Svetla
           </button>
         </div>
-      </nav>
+      </div>
 
-      <Outlet />
       <TanStackRouterDevtools />
     </div>
   );

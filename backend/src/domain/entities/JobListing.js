@@ -1,5 +1,5 @@
 export class JobListing {
-  constructor(title, company, workArrangement, field, city, educationLevel, employmentType, workHours, experienceLevel, applicationDeadline, createdBy) {
+  constructor(title, company, workArrangement, field, city, educationLevel, employmentType, workHours, experienceLevel, applicationDeadline, createdBy, description) {
     if (!title || title.trim() === "") {
       throw new Error("Naslov oglasa je obavezan");
     }
@@ -14,6 +14,7 @@ export class JobListing {
     this.experienceLevel = experienceLevel;
     this.applicationDeadline = applicationDeadline;
     this.createdBy = createdBy;
+    this.description = description;
     this.status = "active";
   }
 }

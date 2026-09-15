@@ -17,7 +17,7 @@ import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as RegisterRouteImport } from './routes/register'
 import { Route as AdminCreateJobRouteImport } from './routes/admin.create-job'
 import { Route as JobsJobIdRouteImport } from './routes/jobs_.$jobId'
-import { Route as AdminJobsJobIdApplicationsRouteImport } from './routes/admin.jobs_.$jobId.applications'
+import { Route as AdminEditJobJobIdRouteImport } from './routes/admin.edit-job.$jobId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -59,12 +59,11 @@ const JobsJobIdRoute = JobsJobIdRouteImport.update({
   path: '/jobs/$jobId',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AdminJobsJobIdApplicationsRoute =
-  AdminJobsJobIdApplicationsRouteImport.update({
-    id: '/admin/jobs_/$jobId/applications',
-    path: '/admin/jobs/$jobId/applications',
-    getParentRoute: () => rootRouteImport,
-  } as any)
+const AdminEditJobJobIdRoute = AdminEditJobJobIdRouteImport.update({
+  id: '/admin/edit-job/$jobId',
+  path: '/admin/edit-job/$jobId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -75,7 +74,7 @@ export interface FileRoutesByFullPath {
   '/register': typeof RegisterRoute
   '/admin/create-job': typeof AdminCreateJobRoute
   '/jobs/$jobId': typeof JobsJobIdRoute
-  '/admin/jobs/$jobId/applications': typeof AdminJobsJobIdApplicationsRoute
+  '/admin/edit-job/$jobId': typeof AdminEditJobJobIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -86,7 +85,7 @@ export interface FileRoutesByTo {
   '/register': typeof RegisterRoute
   '/admin/create-job': typeof AdminCreateJobRoute
   '/jobs/$jobId': typeof JobsJobIdRoute
-  '/admin/jobs/$jobId/applications': typeof AdminJobsJobIdApplicationsRoute
+  '/admin/edit-job/$jobId': typeof AdminEditJobJobIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -98,7 +97,7 @@ export interface FileRoutesById {
   '/register': typeof RegisterRoute
   '/admin/create-job': typeof AdminCreateJobRoute
   '/jobs_/$jobId': typeof JobsJobIdRoute
-  '/admin/jobs_/$jobId/applications': typeof AdminJobsJobIdApplicationsRoute
+  '/admin/edit-job/$jobId': typeof AdminEditJobJobIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -111,7 +110,7 @@ export interface FileRouteTypes {
     | '/register'
     | '/admin/create-job'
     | '/jobs/$jobId'
-    | '/admin/jobs/$jobId/applications'
+    | '/admin/edit-job/$jobId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -122,7 +121,7 @@ export interface FileRouteTypes {
     | '/register'
     | '/admin/create-job'
     | '/jobs/$jobId'
-    | '/admin/jobs/$jobId/applications'
+    | '/admin/edit-job/$jobId'
   id:
     | '__root__'
     | '/'
@@ -133,7 +132,7 @@ export interface FileRouteTypes {
     | '/register'
     | '/admin/create-job'
     | '/jobs_/$jobId'
-    | '/admin/jobs_/$jobId/applications'
+    | '/admin/edit-job/$jobId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -145,7 +144,7 @@ export interface RootRouteChildren {
   RegisterRoute: typeof RegisterRoute
   AdminCreateJobRoute: typeof AdminCreateJobRoute
   JobsJobIdRoute: typeof JobsJobIdRoute
-  AdminJobsJobIdApplicationsRoute: typeof AdminJobsJobIdApplicationsRoute
+  AdminEditJobJobIdRoute: typeof AdminEditJobJobIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -206,11 +205,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof JobsJobIdRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/admin/jobs_/$jobId/applications': {
-      id: '/admin/jobs_/$jobId/applications'
-      path: '/admin/jobs/$jobId/applications'
-      fullPath: '/admin/jobs/$jobId/applications'
-      preLoaderRoute: typeof AdminJobsJobIdApplicationsRouteImport
+    '/admin/edit-job/$jobId': {
+      id: '/admin/edit-job/$jobId'
+      path: '/admin/edit-job/$jobId'
+      fullPath: '/admin/edit-job/$jobId'
+      preLoaderRoute: typeof AdminEditJobJobIdRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -225,7 +224,7 @@ const rootRouteChildren: RootRouteChildren = {
   RegisterRoute: RegisterRoute,
   AdminCreateJobRoute: AdminCreateJobRoute,
   JobsJobIdRoute: JobsJobIdRoute,
-  AdminJobsJobIdApplicationsRoute: AdminJobsJobIdApplicationsRoute,
+  AdminEditJobJobIdRoute: AdminEditJobJobIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
