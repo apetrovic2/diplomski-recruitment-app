@@ -60,7 +60,7 @@ function ProfilePage() {
 
   function handleLogout() {
     logout();
-    navigate({ to: "/login" });
+    navigate({ to: "/" });
   }
 
   const uploadMutation = useMutation({
@@ -98,14 +98,6 @@ function ProfilePage() {
   const buttonClass = isDark
     ? "mt-4 bg-red-500/15 text-red-300 border border-red-500/30 px-4 py-2 rounded-xl hover:bg-red-500/25 transition-colors"
     : "mt-4 bg-red-50 text-red-600 border border-red-200 px-4 py-2 rounded-xl hover:bg-red-100 transition-colors";
-
-  const fileLabelClass = cvFile
-    ? isDark
-      ? "inline-block cursor-pointer bg-gray-700 text-gray-200 text-sm px-4 py-2 rounded-xl hover:bg-gray-600 transition-colors"
-      : "inline-block cursor-pointer bg-gray-100 text-gray-600 text-sm px-4 py-2 rounded-xl hover:bg-gray-200 transition-colors"
-    : isDark
-      ? "inline-block cursor-pointer bg-green-400 text-gray-900 text-sm px-4 py-2 rounded-xl hover:bg-green-300 transition-colors"
-      : "inline-block cursor-pointer text-white text-sm px-4 py-2 rounded-xl bg-gradient-to-r from-pink-500 to-purple-600 hover:opacity-90 transition-opacity";
 
   const uploadButtonClass = cvFile
     ? isDark

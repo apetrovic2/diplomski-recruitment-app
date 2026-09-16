@@ -59,12 +59,19 @@ function RootComponent() {
               >
                 {initials}
               </div>
-              <span className={linkClass("/profile")}>{user.name}</span>
+              <div className="flex flex-col">
+                <span className={linkClass("/profile")}>{user.name}</span>
+                <span className={isDark ? "text-xs text-gray-500" : "text-xs text-gray-400"}>
+                  {user.role === "admin" ? "HR Administrator" : "Kandidat"}
+                </span>
+              </div>
             </Link>
           ) : (
-            <Link to="/login" className={linkClass("/login")}>
-              Prijava
-            </Link>
+            location.pathname !== "/" && (
+              <Link to="/login" className={linkClass("/login")}>
+                Prijava
+              </Link>
+            )
           )}
         </div>
       </nav>

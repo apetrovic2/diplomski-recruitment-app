@@ -264,7 +264,16 @@ function JobDetailPage() {
         )}
 
         {!isAdmin && (
-          <button onClick={() => setShowApplyModal(true)} className={buttonClass}>
+          <button
+            onClick={() => {
+              if (!user.id) {
+                navigate({ to: "/login" });
+              } else {
+                setShowApplyModal(true);
+              }
+            }}
+            className={buttonClass}
+          >
             Prijavi se na poziciju
           </button>
         )}

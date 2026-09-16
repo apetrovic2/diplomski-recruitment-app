@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 
 interface CvDropzoneProps {
   onFileSelect: (file: File) => void;
@@ -9,8 +9,9 @@ interface CvDropzoneProps {
 
 export function CvDropzone({ onFileSelect, selectedFileName, isDark, labelText }: CvDropzoneProps) {
   const [isDragging, setIsDragging] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
 
-  function handleDrop(e: React.DragEvent<HTMLLabelElement>) {
+  function handleDrop(e: React.DragEvent<HTMLDivElement>) {
     e.preventDefault();
     setIsDragging(false);
     const file = e.dataTransfer.files?.[0];
@@ -21,13 +22,17 @@ export function CvDropzone({ onFileSelect, selectedFileName, isDark, labelText }
     }
   }
 
-  function handleDragOver(e: React.DragEvent<HTMLLabelElement>) {
+  function handleDragOver(e: React.DragEvent<HTMLDivElement>) {
     e.preventDefault();
     setIsDragging(true);
   }
 
   function handleDragLeave() {
     setIsDragging(false);
+  }
+
+  function handleClick() {
+    inputRef.current?.click();
   }
 
   const dropzoneClass = isDragging
@@ -39,21 +44,23 @@ export function CvDropzone({ onFileSelect, selectedFileName, isDark, labelText }
       : "bg-gray-50 rounded-2xl p-8 text-center cursor-pointer hover:bg-purple-50 transition-all";
 
   return (
-    <label
+    <div
       onDrop={handleDrop}
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
-      className={dropzoneClass + " relative"}
+      onClick={handleClick}
+      className={dropzoneClass}
     >
       <input
+        ref={inputRef}
         type="file"
         accept="application/pdf"
         onChange={(e) => {
-            const file = e.target.files?.[0];
-            if (file) onFileSelect(file);
+          const file = e.target.files?.[0];
+          if (file) onFileSelect(file);
         }}
-        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-        />
+        style={{ display: "none" }}
+      />
       <svg
         className={isDark ? "w-8 h-8 mx-auto mb-2 text-gray-500" : "w-8 h-8 mx-auto mb-2 text-gray-400"}
         fill="none"
@@ -73,6 +80,6 @@ export function CvDropzone({ onFileSelect, selectedFileName, isDark, labelText }
       <p className={isDark ? "text-gray-500 text-xs mt-1" : "text-gray-400 text-xs mt-1"}>
         Prevucite fajl ovde ili kliknite da izaberete
       </p>
-    </label>
+    </div>
   );
 }

@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, Link, redirect } from "@tanstack/react-router";
 import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { login } from "../api/auth";
@@ -6,6 +6,12 @@ import { useTheme } from "../context/ThemeContext";
 import { useAuth } from "../context/AuthContext";
 
 export const Route = createFileRoute("/login")({
+  beforeLoad: () => {
+    const user = localStorage.getItem("user");
+    if (user) {
+      throw redirect({ to: "/jobs" });
+    }
+  },
   component: LoginPage,
 });
 

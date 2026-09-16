@@ -45,12 +45,12 @@ function MyApplicationsPage() {
   }
 
   return (
-    <div className="max-w-2xl mx-auto px-6 py-10">
+    <div className="max-w-5xl mx-auto px-6 py-10">
       <h1 className={`text-3xl font-bold mb-6 ${isDark ? "text-white" : "text-gray-900"}`}>Moje prijave</h1>
       {applications?.length === 0 && (
         <p className={isDark ? "text-gray-400" : "text-gray-500"}>Još nemate nijednu prijavu.</p>
       )}
-      <div className="flex flex-col gap-3">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {applications?.map((app) => {
           const job = jobs?.find((j) => j._id === app.jobId);
           return (
