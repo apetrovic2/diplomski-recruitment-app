@@ -280,7 +280,7 @@ function JobDetailPage() {
 
         {isAdmin && !isOwner && (
           <p className={isDark ? "text-gray-400 text-sm mt-6" : "text-gray-500 text-sm mt-6"}>
-            Ovo je oglas drugog administratora — nemate pristup pregledu prijava.
+            Ovo je oglas drugog administratora, nemate pristup pregledu prijava.
           </p>
         )}
       </div>
@@ -584,7 +584,7 @@ function JobDetailPage() {
               Prijava bez CV-ja
             </h2>
             <p className={isDark ? "text-gray-300 text-sm mb-6" : "text-gray-600 text-sm mb-6"}>
-              Niste priložili CV uz ovu prijavu. Poslodavci obično očekuju CV — da li ipak želite da nastavite bez njega?
+              Niste priložili CV uz ovu prijavu. Poslodavci obično očekuju CV, da li ipak želite da nastavite bez njega?
             </p>
             <div className="flex gap-3">
               <button
