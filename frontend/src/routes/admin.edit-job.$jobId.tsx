@@ -108,98 +108,104 @@ function EditJobPage() {
   }
 
   return (
-    <div className="max-w-2xl mx-auto px-6 py-16">
+    <div className="max-w-6xl mx-auto px-6 py-16">
       <div className={cardClass}>
         <h1 className={`text-2xl font-bold text-center mb-8 ${isDark ? "text-white" : "text-gray-900"}`}>
           Izmeni oglas
         </h1>
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-          <div>
-            <label className={labelClass}>
-              Naziv pozicije <span className="text-red-500">*</span>
-            </label>
-            <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} className={inputClass} />
-            {attemptedSubmit && titleEmpty && (
-              <p className="text-red-500 text-xs mt-1">Naziv pozicije je obavezan</p>
-            )}
-          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="flex flex-col gap-4">
+              <div>
+                <label className={labelClass}>
+                  Naziv pozicije <span className="text-red-500">*</span>
+                </label>
+                <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} className={inputClass} />
+                {attemptedSubmit && titleEmpty && (
+                  <p className="text-red-500 text-xs mt-1">Naziv pozicije je obavezan</p>
+                )}
+              </div>
 
-          <div>
-            <label className={labelClass}>
-              Kompanija <span className="text-red-500">*</span>
-            </label>
-            <input type="text" value={company} onChange={(e) => setCompany(e.target.value)} className={inputClass} />
-            {attemptedSubmit && companyEmpty && (
-              <p className="text-red-500 text-xs mt-1">Naziv kompanije je obavezan</p>
-            )}
-          </div>
+              <div>
+                <label className={labelClass}>
+                  Kompanija <span className="text-red-500">*</span>
+                </label>
+                <input type="text" value={company} onChange={(e) => setCompany(e.target.value)} className={inputClass} />
+                {attemptedSubmit && companyEmpty && (
+                  <p className="text-red-500 text-xs mt-1">Naziv kompanije je obavezan</p>
+                )}
+              </div>
 
-          <div>
-            <label className={labelClass}>Opis pozicije</label>
-            <textarea
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              rows={4}
-              className={inputClass}
-            />
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className={labelClass}>Način rada</label>
-              <select value={workArrangement} onChange={(e) => setWorkArrangement(e.target.value)} className={inputClass}>
-                {workArrangements.map((opt) => <option key={opt} value={opt}>{opt}</option>)}
-              </select>
+              <div>
+                <label className={labelClass}>Opis pozicije</label>
+                <textarea
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  rows={8}
+                  className={inputClass}
+                />
+              </div>
             </div>
 
-            <div>
-              <label className={labelClass}>Oblast rada</label>
-              <select value={field} onChange={(e) => setField(e.target.value)} className={inputClass}>
-                {fields.map((opt) => <option key={opt} value={opt}>{opt}</option>)}
-              </select>
+            <div className="flex flex-col gap-4">
+              <div>
+                <label className={labelClass}>Način rada</label>
+                <select value={workArrangement} onChange={(e) => setWorkArrangement(e.target.value)} className={inputClass}>
+                  {workArrangements.map((opt) => <option key={opt} value={opt}>{opt}</option>)}
+                </select>
+              </div>
+
+              <div>
+                <label className={labelClass}>Oblast rada</label>
+                <select value={field} onChange={(e) => setField(e.target.value)} className={inputClass}>
+                  {fields.map((opt) => <option key={opt} value={opt}>{opt}</option>)}
+                </select>
+              </div>
+
+              <div>
+                <label className={labelClass}>Grad</label>
+                <CityAutocomplete cities={cities} value={city} onChange={setCity} isDark={isDark} inputClass={inputClass} />
+              </div>
+
+              <div>
+                <label className={labelClass}>Stručna sprema</label>
+                <select value={educationLevel} onChange={(e) => setEducationLevel(e.target.value)} className={inputClass}>
+                  {educationLevels.map((opt) => <option key={opt} value={opt}>{opt}</option>)}
+                </select>
+              </div>
             </div>
 
-            <div>
-              <label className={labelClass}>Grad</label>
-              <CityAutocomplete cities={cities} value={city} onChange={setCity} isDark={isDark} inputClass={inputClass} />
-            </div>
+            <div className="flex flex-col gap-4">
+              <div>
+                <label className={labelClass}>Tip zaposlenja</label>
+                <select value={employmentType} onChange={(e) => setEmploymentType(e.target.value)} className={inputClass}>
+                  {employmentTypes.map((opt) => <option key={opt} value={opt}>{opt}</option>)}
+                </select>
+              </div>
 
-            <div>
-              <label className={labelClass}>Stručna sprema</label>
-              <select value={educationLevel} onChange={(e) => setEducationLevel(e.target.value)} className={inputClass}>
-                {educationLevels.map((opt) => <option key={opt} value={opt}>{opt}</option>)}
-              </select>
-            </div>
+              <div>
+                <label className={labelClass}>Radno vreme</label>
+                <select value={workHours} onChange={(e) => setWorkHours(e.target.value)} className={inputClass}>
+                  {workHoursOptions.map((opt) => <option key={opt} value={opt}>{opt}</option>)}
+                </select>
+              </div>
 
-            <div>
-              <label className={labelClass}>Tip zaposlenja</label>
-              <select value={employmentType} onChange={(e) => setEmploymentType(e.target.value)} className={inputClass}>
-                {employmentTypes.map((opt) => <option key={opt} value={opt}>{opt}</option>)}
-              </select>
-            </div>
+              <div>
+                <label className={labelClass}>Nivo iskustva</label>
+                <select value={experienceLevel} onChange={(e) => setExperienceLevel(e.target.value)} className={inputClass}>
+                  {experienceLevels.map((opt) => <option key={opt} value={opt}>{opt}</option>)}
+                </select>
+              </div>
 
-            <div>
-              <label className={labelClass}>Radno vreme</label>
-              <select value={workHours} onChange={(e) => setWorkHours(e.target.value)} className={inputClass}>
-                {workHoursOptions.map((opt) => <option key={opt} value={opt}>{opt}</option>)}
-              </select>
-            </div>
-
-            <div>
-              <label className={labelClass}>Nivo iskustva</label>
-              <select value={experienceLevel} onChange={(e) => setExperienceLevel(e.target.value)} className={inputClass}>
-                {experienceLevels.map((opt) => <option key={opt} value={opt}>{opt}</option>)}
-              </select>
-            </div>
-
-            <div>
-              <label className={labelClass}>Rok za prijavu</label>
-              <input
-                type="date"
-                value={applicationDeadline}
-                onChange={(e) => setApplicationDeadline(e.target.value)}
-                className={inputClass}
-              />
+              <div>
+                <label className={labelClass}>Rok za prijavu</label>
+                <input
+                  type="date"
+                  value={applicationDeadline}
+                  onChange={(e) => setApplicationDeadline(e.target.value)}
+                  className={inputClass}
+                />
+              </div>
             </div>
           </div>
 
